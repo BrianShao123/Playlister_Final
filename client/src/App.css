@@ -109,8 +109,9 @@ body {
 
 #edit-toolbar {
   background-color: transparent;
-  float: right;
 }
+
+
 
 #search-bar {
   position: relative;
@@ -120,6 +121,12 @@ body {
   vertical-align: center;
 }
 
+#sort {
+  position: relative;
+  left: 42%;
+  height: 5%;
+  
+}
 
 .top5-button,
 .top5-button-disabled {
@@ -160,8 +167,8 @@ body {
 
 #list-selector-heading {
   position: absolute;
-  left: 9em;
-  top: 0%;
+  left: 10em;
+  top: 89%;
   width: 50%;
   height: 10%;
   text-align: center;
@@ -172,7 +179,13 @@ body {
   justify-content: center;
 }
 
+svg {
+  pointer-events: none;
+}
 
+path{
+  pointer-events: none;
+}
 
 #add-list-button {
   float: left;
@@ -182,20 +195,22 @@ body {
   position: absolute;
   left: 0%;
   top: 19.5%;
-  width: 60%;
-  height: 80.5%;
+  width: 59.8%;
+  height: 69.9%;
   display: flex;
   border-radius: 20;
   flex-direction: column;
   overflow: scroll;
+  background-color: #111111;
 }
+
 
 #extension-tab{
   position: absolute;
   left: 59.75%;
   top: 19.5%;
   width: 40%;
-  height: 80%;
+  height: 69.4%;
   border-color: black;
   border-width: 2px;
   border-style: solid;
@@ -209,8 +224,8 @@ body {
 .unselected-list-card {
   font-size: 18pt;
   margin: 10px;
-  padding: 20px;
-  border-radius: 25px;
+  padding: 10px;
+  border-radius: 10px;
 }
 
 .list-card:aria-disabled,
@@ -221,13 +236,48 @@ body {
   pointer-events: none;
 }
 
+
 .unselected-list-card:hover {
   cursor: pointer;
   background-color: var(--swatch-contrast);
   color: white;
 }
 
-.selected-list-card {
+.song-card,
+.selected-song-card,
+.unselected-song-card {
+  font-size: 18pt;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.song-card:aria-disabled,
+.song-card[aria-disabled] {
+  border: 1px solid #999999;
+  background-color: #f1bbbb;
+  color: #666666;
+  pointer-events: none;
+}
+
+
+.unselected-song-card:hover {
+  cursor: pointer;
+  background-color: var(--swatch-contrast);
+  color: white;
+}
+
+.selected-song-card:hover{
+  cursor: pointer;
+  background-color: var(--swatch-contrast);
+  color: white;
+}
+
+.unselected-song-card {
+  background-color: var(--swatch-complement);
+}
+
+.selected-song-card{
   background-color: var(--swatch-accent);
   color: white;
 }
@@ -237,8 +287,8 @@ body {
 }
 
 .list-card-button {
-  float: right;
-  transform: scale(1.25);
+  
+  float: right; 
 }
 
 #workspace-home,

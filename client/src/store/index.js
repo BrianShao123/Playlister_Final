@@ -58,6 +58,7 @@ function GlobalStoreContextProvider(props) {
         listNameActive: false,
         listIdMarkedForDeletion: null,
         listMarkedForDeletion: null,
+        editSong: false
         
     });
     const history = useHistory();
@@ -182,7 +183,8 @@ function GlobalStoreContextProvider(props) {
                     newListCounter: store.newListCounter,
                     listNameActive: false,
                     listIdMarkedForDeletion: null,
-                    listMarkedForDeletion: null
+                    listMarkedForDeletion: null,
+                    editSong: payload.edit
                 });
             }
             case GlobalStoreActionType.REMOVE_SONG: {
@@ -210,6 +212,8 @@ function GlobalStoreContextProvider(props) {
                     listNameActive: false,
                     listIdMarkedForDeletion: null,
                     listMarkedForDeletion: null,
+                    songMarkedForDeletion: null,
+                    editSong: false
                 });
             }
             default:
@@ -284,7 +288,7 @@ function GlobalStoreContextProvider(props) {
             );
 
             // IF IT'S A VALID LIST THEN LET'S START EDITING IT
-            history.push("/playlist/" + newList._id);
+            history.push("/");
         }
         else {
             console.log("API FAILED TO CREATE A NEW LIST");
@@ -353,7 +357,7 @@ function GlobalStoreContextProvider(props) {
     store.showEditSongModal = (songIndex, songToEdit) => {
         storeReducer({
             type: GlobalStoreActionType.EDIT_SONG,
-            payload: {currentSongIndex: songIndex, currentSong: songToEdit}
+            payload: {currentSongIndex: songIndex, currentSong: songToEdit, edit: true}
         });        
     }
     store.showRemoveSongModal = (songIndex, songToRemove) => {
@@ -384,6 +388,7 @@ function GlobalStoreContextProvider(props) {
     // moveItem, updateItem, updateCurrentList, undo, and redo
     store.setCurrentList = function (id) {
         async function asyncSetCurrentList(id) {
+            console.log("id sent to store is " + id);
             let response = await api.getPlaylistById(id);
             if (response.data.success) {
                 let playlist = response.data.playlist;
@@ -395,6 +400,7 @@ function GlobalStoreContextProvider(props) {
                         payload: playlist
                     });
                     //history.push("/playlist/" + playlist._id);
+                    //console.log(store.currentList.songs); 
                 }
             }
         }
@@ -529,11 +535,18 @@ function GlobalStoreContextProvider(props) {
     }
 
     // THIS FUNCTION ENABLES THE PROCESS OF EDITING A LIST NAME
-    store.setIsListNameEditActive = function () {
+    store.setIsListNameEditActive = function (id) {
+        async function setListToEdit(id) {
+            let response = await api.getPlaylistById(id);
+            if (response.data.success) {
+                let playlist = response.data.playlist;
         storeReducer({
             type: GlobalStoreActionType.SET_LIST_NAME_EDIT_ACTIVE,
-            payload: null
+            payload: playlist
         });
+        }
+    }
+    setListToEdit(id);
     }
 
     return (

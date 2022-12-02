@@ -5,12 +5,22 @@ import AddIcon from '@mui/icons-material/Add';
 import RedoIcon from '@mui/icons-material/Redo';
 import UndoIcon from '@mui/icons-material/Undo';
 import CloseIcon from '@mui/icons-material/HighlightOff';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 /*
     This toolbar is a functional React component that
     manages the undo/redo/close buttons.
     
     @author McKilla Gorilla
+
+
+    <Button 
+                disabled={!store.canClose()}
+                id='close-button'
+                onClick={handleClose}
+                variant="contained">
+                    <CloseIcon />
+            </Button>
 */
 function EditToolbar() {
     const { store } = useContext(GlobalStoreContext);
@@ -27,6 +37,11 @@ function EditToolbar() {
     function handleClose() {
         store.closeCurrentList();
     }
+
+    function handleCloneList() {
+
+    }
+
     return (
         <div id="edit-toolbar">
             <Button
@@ -50,13 +65,14 @@ function EditToolbar() {
                 variant="contained">
                     <RedoIcon />
             </Button>
-            <Button 
-                disabled={!store.canClose()}
-                id='close-button'
-                onClick={handleClose}
+            <Button
+                disabled={!store.canRedo()}
+                id='clone-list-button'
+                onClick={handleCloneList}
                 variant="contained">
-                    <CloseIcon />
+                <ContentCopyIcon />
             </Button>
+            
         </div>
     )
 }

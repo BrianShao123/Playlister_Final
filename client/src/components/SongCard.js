@@ -5,6 +5,7 @@ function SongCard(props) {
     const { store } = useContext(GlobalStoreContext);
     const [ draggedTo, setDraggedTo ] = useState(0);
     const { song, index } = props;
+    const [selected, setSelect] = useState(false);
 
     function handleDragStart(event) {
         event.dataTransfer.setData("song", index);
@@ -34,6 +35,7 @@ function SongCard(props) {
         store.addMoveSongTransaction(sourceIndex, targetIndex);
     }
     function handleRemoveSong(event) {
+        console.log("remove initiated");
         store.showRemoveSongModal(index, song);
     }
     function handleClick(event) {
@@ -47,16 +49,32 @@ function SongCard(props) {
         store.showEditSongModal(index, song);
     }
 
+    function selectSong() {
+        let select = !selected;
+      setSelect(select);
+        
+    }
+
+
+    let selectClass = "unselected-song-card";
+    if (selected) {
+        selectClass = "selected-song-card";
+    }
+    else 
+        selectClass = "unselected-song-card";
+
+
     let cardClass = "list-card unselected-list-card";
     return (
         <div
             key={index}
             id={'song-' + index + '-card'}
-            className={cardClass}
+            className={selectClass}
             onDragStart={handleDragStart}
             onDragOver={handleDragOver}
             onDragEnter={handleDragEnter}
             onDragLeave={handleDragLeave}
+            onClick={selectSong}
             onDoubleClick = {handleEdit}
             onDrop={handleDrop}
             draggable="true"

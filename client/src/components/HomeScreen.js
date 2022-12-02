@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { GlobalStoreContext } from '../store'
 import ListCard from './ListCard.js'
 import MUIDeleteModal from './MUIDeleteModal'
@@ -9,6 +9,7 @@ import List from '@mui/material/List';
 import Typography from '@mui/material/Typography'
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
+import { Grid } from '@mui/material';
 import Toolbar from '@mui/material/Toolbar';
 import AppBar from '@mui/material/AppBar';
 import TextField from '@mui/material/TextField';
@@ -18,11 +19,16 @@ import HomeIcon from '@mui/icons-material/Home';
 import PersonIcon from '@mui/icons-material/Person';
 import SearchIcon from '@mui/icons-material/Search';
 
-import { styled } from '@mui/material/styles';
-import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
 import SongCard from './SongCard.js'
 import { useHistory } from 'react-router-dom'
 import Box from '@mui/material/Box';
+import MUIRemoveSongModal from './MUIRemoveSongModal';
+import PropTypes from 'prop-types';
+import MUIEditSongModal from './MUIEditSongModal';
+import SortIcon from '@mui/icons-material/Sort';
+import IconButton from '@mui/material/IconButton';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 /*
     This React component lists all the top5 lists in the UI.
     
@@ -30,12 +36,47 @@ import Box from '@mui/material/Box';
 */
 
 
-
     const HomeScreen = () => {
     const { store } = useContext(GlobalStoreContext);
     const [value, setValue] = React.useState(0);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const isMenuOpen = Boolean(anchorEl);
     store.history = useHistory();
     
+    function TabPanel(props) {
+      const { children, value, index, ...other } = props;
+
+      return (
+        <div
+          role="tabpanel"
+          hidden={value !== index}
+          id={`simple-tabpanel-${index}`}
+          aria-labelledby={`simple-tab-${index}`}
+          {...other}
+        >
+          {value === index && (
+            <Box sx={{ p: 3 }}>
+              <Typography>{children}</Typography>
+            </Box>
+          )}
+        </div>
+      );
+    
+    
+    }
+    
+    TabPanel.propTypes = {
+      children: PropTypes.node,
+      index: PropTypes.number.isRequired,
+      value: PropTypes.number.isRequired,
+    };
+    
+    function a11yProps(index) {
+      return {
+        id: `simple-tab-${index}`,
+        'aria-controls': `simple-tabpanel-${index}`,
+      };
+    }
 
     useEffect(() => {
         store.loadIdNamePairs();
@@ -53,6 +94,40 @@ import Box from '@mui/material/Box';
     const handleChange = (event, newValue) => {
         setValue(newValue);
       };
+
+    const handleSortMenuOpen = (event) => {
+        //store.closeCurrentList();
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleSortMenuClose = () => {
+        setAnchorEl(null);
+    };
+    const sortMenuId = 'sort-menu';
+    const sortMenu = (
+      <Menu
+          anchorEl={anchorEl}
+          anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+          }}
+          id={sortMenuId}
+          keepMounted
+          transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+          }}
+          open={isMenuOpen}
+          onClose={handleSortMenuClose}
+      >
+          <MenuItem onClick={handleSortMenuClose}>Name (A-Z)</MenuItem>
+          <MenuItem onClick={handleSortMenuClose}>Publish Dates (Newest)</MenuItem>
+          <MenuItem onClick={handleSortMenuClose}>Listens (High-Low)</MenuItem>
+          <MenuItem onClick={handleSortMenuClose}>Likes (High-Low)</MenuItem>
+          <MenuItem onClick={handleSortMenuClose}>Dislike (High-Low)</MenuItem>
+      </Menu>
+    );
+
     let songCard = "";
     if(store.currentList) {
         songCard = 
@@ -78,25 +153,30 @@ import Box from '@mui/material/Box';
          {}
          </Box>
     }
+    
+
     let listCard = "";
     if (store) {
         listCard = 
-            <List sx={{ width: '90%', left: '5%', bgcolor: 'background.paper' }}>
-            {
                 store.idNamePairs.map((pair) => (
-                    <ListCard
+                    <ListCard 
                         key={pair._id}
                         idNamePair={pair}
-                        selected={false}
+                        //selected={false}
                     />
 
                 ))
                 
-            }
-            </List>;
+    }
+    let modalJSX = "";
+    if(store.songMarkedForDeletion) {
+      modalJSX = <MUIRemoveSongModal/>;
+    }
+    else if(store.editSong) {
+      modalJSX = <MUIEditSongModal/>;
     }
     return (
-        <div id="playlist-selector">
+      <Box> 
             <AppBar position="static" elevation={0} sx={{ height: '10%'}}  style={{ background: '#e6e6e6' }}>
             <Toolbar>
                     <Typography                        
@@ -148,6 +228,16 @@ import Box from '@mui/material/Box';
                         sx={{ backgroundColor: 'white', width: '30vw' }}
                         />
                     </div>
+                    <div id="sort">
+                    <IconButton onClick={handleSortMenuOpen} aria-label='sort'
+                        sx = {{display: {  backgroundColor: '#12345',
+                        '&:hover': {
+                          backgroundColor: 'gray',
+                          color: 'white'},  borderRadius: 10 }}}>
+                    <Typography sx ={{color: 'black'}}> Sort By</Typography>
+                    <SortIcon style={{fontSize:'28pt', color: 'black'}} />
+                </IconButton>
+                    </div>
                 </Toolbar>
 
             </AppBar>
@@ -166,12 +256,13 @@ import Box from '@mui/material/Box';
                 {
                     listCard
                 }
-                <MUIDeleteModal />
+                
             </div>
             <div id="extension-tab">
                 {
                    
                     //youtuber and comments tab
+                    <Box sx={{ width: '100%' }}>
                     <Tabs 
                         value={value} 
                         onChange={handleChange}
@@ -181,13 +272,22 @@ import Box from '@mui/material/Box';
                             }
                           }}
                     >
-                        <Tab label="Player" sx={{bgcolor:'background.paper'}}/>
-                        <Tab label="Comment" sx={{bgcolor:'background.paper'}}/>
+                        <Tab label="Player" sx={{bgcolor:'background.paper'}} {...a11yProps(0)}/>
+                        <Tab label="Comment" sx={{bgcolor:'background.paper'}} {...a11yProps(1)}/>
                     </Tabs>
-                    
+                      <TabPanel value={value} index={0}>
+                        Item One
+                      </TabPanel>
+                      <TabPanel value={value} index={1}>
+                        Item Two
+                      </TabPanel>
+                    </Box>
                 }
             </div>
-        </div>)
+            {modalJSX}
+            {sortMenu}
+            </Box>
+        )
 }
 
 export default HomeScreen;
