@@ -27,6 +27,7 @@ function EditToolbar() {
 
     function handleAddNewSong() {
         store.addNewSong();
+        
     }
     function handleUndo() {
         store.undo();
@@ -38,9 +39,6 @@ function EditToolbar() {
         store.closeCurrentList();
     }
 
-    function handleCloneList() {
-
-    }
 
     return (
         <div id="edit-toolbar">
@@ -65,13 +63,7 @@ function EditToolbar() {
                 variant="contained">
                     <RedoIcon />
             </Button>
-            <Button
-                disabled={!store.canRedo()}
-                id='clone-list-button'
-                onClick={handleCloneList}
-                variant="contained">
-                <ContentCopyIcon />
-            </Button>
+            
             
         </div>
     )

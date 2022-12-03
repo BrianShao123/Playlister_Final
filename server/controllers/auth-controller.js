@@ -73,6 +73,7 @@ loginUser = async (req, res) => {
         }).status(200).json({
             success: true,
             user: {
+                userName: existingUser.userName, 
                 firstName: existingUser.firstName,
                 lastName: existingUser.lastName,  
                 email: existingUser.email              
@@ -96,9 +97,9 @@ logoutUser = async (req, res) => {
 
 registerUser = async (req, res) => {
     try {
-        const { username, firstName, lastName, email, password, passwordVerify } = req.body;
-        console.log("create user: " + username + firstName + " " + lastName + " " + email + " " + password + " " + passwordVerify);
-        if (!username || !firstName || !lastName || !email || !password || !passwordVerify) {
+        const { userName, firstName, lastName, email, password, passwordVerify } = req.body;
+        console.log("create user: " + userName + firstName + " " + lastName + " " + email + " " + password + " " + passwordVerify);
+        if (!userName || !firstName || !lastName || !email || !password || !passwordVerify) {
             return res
                 .status(400)
                 .json({ errorMessage: "Please enter all required fields." });
@@ -120,7 +121,7 @@ registerUser = async (req, res) => {
                 })
         }
         console.log("password and password verify match");
-        const existingUser = await User.findOne({ username: username, email: email });
+        const existingUser = await User.findOne({ userName: userName, email: email });
         console.log("existingUser: " + existingUser);
         if (existingUser) {
             return res
@@ -137,7 +138,7 @@ registerUser = async (req, res) => {
         console.log("passwordHash: " + passwordHash);
 
         const newUser = new User({
-            firstName, lastName, email, passwordHash
+            userName, firstName, lastName, email, passwordHash
         });
         const savedUser = await newUser.save();
         console.log("new user saved: " + savedUser._id);
@@ -153,6 +154,7 @@ registerUser = async (req, res) => {
         }).status(200).json({
             success: true,
             user: {
+                userName: savedUser.UserName,
                 firstName: savedUser.firstName,
                 lastName: savedUser.lastName,  
                 email: savedUser.email              

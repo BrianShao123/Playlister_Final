@@ -9,7 +9,7 @@ import List from '@mui/material/List';
 import Typography from '@mui/material/Typography'
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import { Grid } from '@mui/material';
+
 import Toolbar from '@mui/material/Toolbar';
 import AppBar from '@mui/material/AppBar';
 import TextField from '@mui/material/TextField';
@@ -29,6 +29,11 @@ import SortIcon from '@mui/icons-material/Sort';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+
+
+import YouTubePlayer from './YouTubePlayer';
+import MUIPublishModal from './MUIPublishModal';
+
 /*
     This React component lists all the top5 lists in the UI.
     
@@ -81,6 +86,24 @@ import MenuItem from '@mui/material/MenuItem';
     useEffect(() => {
         store.loadIdNamePairs();
     }, []);
+
+    function handleSkipBackward() {
+
+    }
+
+    function handleStop() {
+
+    }
+
+    function handlePlay(){ 
+
+    }
+
+    function handleSkipForward() {
+
+    }
+
+
     
     function handleCreateNewList() {
         store.createNewList();
@@ -174,6 +197,12 @@ import MenuItem from '@mui/material/MenuItem';
     }
     else if(store.editSong) {
       modalJSX = <MUIEditSongModal/>;
+    }
+    else if(store.currentModal == "DELETE_LIST") {
+      modalJSX = <MUIDeleteModal />
+    }
+    else if(store.currentModal == "PUBLISH_LIST") {
+      modalJSX = <MUIPublishModal/>
     }
     return (
       <Box> 
@@ -276,7 +305,7 @@ import MenuItem from '@mui/material/MenuItem';
                         <Tab label="Comment" sx={{bgcolor:'background.paper'}} {...a11yProps(1)}/>
                     </Tabs>
                       <TabPanel value={value} index={0}>
-                        Item One
+                      <YouTubePlayer/>
                       </TabPanel>
                       <TabPanel value={value} index={1}>
                         Item Two
@@ -289,5 +318,6 @@ import MenuItem from '@mui/material/MenuItem';
             </Box>
         )
 }
+////"<YouTubePlayer/>"
 
 export default HomeScreen;

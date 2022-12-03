@@ -7,11 +7,15 @@ import ThumbDownOffAltIcon from '@mui/icons-material/ThumbDownOffAlt';
 import ThumbUpOffAltIcon from '@mui/icons-material/ThumbUpOffAlt';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Grid} from '@mui/material';
-
+import DeleteIcon from '@mui/icons-material/Delete';
 import SongCard from './SongCard.js'
 import React, { useEffect } from 'react'
 import EditToolbar from './EditToolbar'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import Button from '@mui/material/Button';
+import PublishIcon from '@mui/icons-material/Publish';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+
 
 /*
     This is a card in our list of top 5 lists. It lets select
@@ -26,7 +30,7 @@ function ListCard(props) {
     const [editActive, setEditActive] = useState(false);
     const [text, setText] = useState("");
     const { idNamePair} = props;
-    const [expand, setExpand] = useState(false);
+    //const [expand, setExpand] = useState(false);
     const [selected, setSelect] = useState(false);
 
 
@@ -44,26 +48,27 @@ function ListCard(props) {
         }
     }
 
-    let editToolbar = "";
-    let buttonSet = "";
-    if(expand) {
-      editToolbar = <EditToolbar />;
-      
-    }
-    
 
     function toggleOpen(event) {
         event.stopPropagation();
-        let newState = !expand;
-        console.log("expand state is " + expand);
-        setSelect(newState);
-        if(newState) {
-          let id = event.target.id;
-          id = ("" + id).substring("expand-".length);
-          store.setCurrentList(id);
+       // let newState = !expand;
+        //console.log("expand state is " + expand);
+        //console.log("list is " + store.currentList._id);
+        //console.log("idNamePair is " + idNamePair._id);
+        //console.log(idNamePair._id === store.currentList._id);
+        //setSelect(newState);
+        //if(newState) {
+          if(!store.currentList || store.currentList._id != idNamePair._id) {
+            let id = event.target.id;
+            id = ("" + id).substring("expand-".length);
+            store.setCurrentList(id);
+          }
+          if(store.currentList && store.currentList._id == idNamePair._id)
+          //console.log("RAN")
+            store.closeCurrentList();
           
-        }
-        setExpand(newState);
+        //}
+        //setExpand(newState);
       }
 
     function openCurrentList(event) {
@@ -85,11 +90,23 @@ function ListCard(props) {
         setEditActive(newActive);
     }
 
-    async function handleDeleteList(event, id) {
+    function handleDeleteList(event) {
         event.stopPropagation();
-        let _id = event.target.id;
-        _id = ("" + _id).substring("delete-list-".length);
+        let id = event.target.id;
+        id = ("" + id).substring("delete-list-".length);
         store.markListForDeletion(id);
+    }
+
+    function handlePublishList(event) {
+      event.stopPropagation();
+        let id = event.target.id;
+        id = ("" + id).substring("publish-list-".length);
+        store.markListForPublication(id);
+        console.log("marked publish id " + store.listIdMarkedForPublication);
+    }
+
+    function handleCloneList() {
+
     }
 
     function handleKeyPress(event) {
@@ -107,8 +124,8 @@ function ListCard(props) {
         console.log("event setText is " + event.target.value);
         setText(event.target.value);
     }
-
-    console.log("card is " + selected);
+    //console.log(idNamePair);
+    //console.log("card is " + selected);
     let selectClass = "unselected-list-card";
     if (selected) {
         selectClass = "selected-list-card";
@@ -118,10 +135,75 @@ function ListCard(props) {
         cardStatus = true;
     }
 
-    
 
+
+    let thumbsUp = "";
+    let thumbsDown = "";
+    let numLikes = "";
+    let numDislikes = "";
+    let editToolbar = "";
+    let buttonSet = "";
+    let publishDate = "";
+    if(idNamePair.published) {
+      thumbsUp = 
+      <IconButton onClick={openCurrentList} aria-label='edit'
+          sx = {{display: { xs: 'none', sm: 'block',  backgroundColor: '#12345',
+          '&:hover': {
+          backgroundColor: 'gray',
+          color: 'white'},  borderRadius: 10 }}}>
+        <ThumbUpOffAltIcon style={{fontSize:'20pt', color: 'blue'}} />
+      </IconButton>
+      thumbsDown = 
+      <IconButton onClick={openCurrentList} aria-label='edit'
+          sx = {{display: { xs: 'none', sm: 'block',  backgroundColor: '#12345',
+          '&:hover': {
+            backgroundColor: 'gray',
+            color: 'white'},  borderRadius: 10 }}}>
+        <ThumbDownOffAltIcon style={{fontSize:'20pt', color: 'blue'}} />
+      </IconButton>
+      numLikes = idNamePair.likes;
+      numDislikes = idNamePair.dislikes;
+      publishDate = "Published: " + idNamePair.publishDate;
+    }
+    if(store.currentList) {
+      if(store.currentList._id === idNamePair._id) {
+        editToolbar = 
+          <EditToolbar />;
+        buttonSet =
+        <Box>
+        <Button id = {"delete-list-" + idNamePair._id}
+            onClick={handleDeleteList} aria-label='delete'
+            variant="contained">
+            <DeleteIcon />
+        </Button>
+        <Button id = {"publish-list-" + idNamePair._id}
+          onClick={handlePublishList} aria-label='publish'
+          variant="contained">
+          <PublishIcon/>
+        </Button>
+        <Button
+          id='clone-list-button'
+          onClick={handleCloneList}
+          variant="contained">
+          <ContentCopyIcon />
+        </Button>
+        </Box>;
+
+      }
+
+  }
+    let decision = false;
+
+  
+    //console.log("at render list is " + store.currentList._id);
     let songCard = "";
-    if(expand && store.currentList) {
+    if(store.currentList) {
+      console.log("list is " + store.currentList._id);
+        console.log("idNamePair is " + idNamePair._id);
+      if(store.currentList._id === idNamePair._id) {
+        
+      selectClass = "selected-list-card";
+      decision = true;
         songCard = 
         <Box style = {{width: '90%', backgroundColor: 'white', height: '20vw', overflow: 'scroll', transform: 'translate(1.5em ,1em) scale(1)'}}>
 
@@ -136,9 +218,10 @@ function ListCard(props) {
                 ))  
             }
           </Box>
-         //console.log("Song card is " + songCard)
     }
-    let cardName = "";
+  }
+   
+        let cardName = "";
     if(!editActive) 
     {
       cardName =  idNamePair.name;
@@ -174,34 +257,26 @@ function ListCard(props) {
             <Grid item xs={8} sx={{transform: 'translate(1em ,0.5em) scale(1)'}}  
             id = {"expand-" + idNamePair._id}
             onDoubleClick = {toggleEdit}>{ cardName} </Grid>
+            
             <Grid item xs={2} sx={{transform: 'translate(1em ,0em) scale(1)'}}> 
-            <IconButton onClick={openCurrentList} aria-label='edit'
-                        sx = {{display: { xs: 'none', sm: 'block',  backgroundColor: '#12345',
-                        '&:hover': {
-                          backgroundColor: 'gray',
-                          color: 'white'},  borderRadius: 10 }}}>
-                    <ThumbUpOffAltIcon style={{fontSize:'20pt', color: 'blue'}} />
-                </IconButton>
+              {thumbsUp}
             </Grid> 
             <Grid item xs={2} sx={{transform: 'translate(1em ,0em) scale(1)'}}> 
-            <IconButton onClick={openCurrentList} aria-label='edit'
-                        sx = {{display: { xs: 'none', sm: 'block',  backgroundColor: '#12345',
-                        '&:hover': {
-                          backgroundColor: 'gray',
-                          color: 'white'},  borderRadius: 10 }}}>
-                    <ThumbDownOffAltIcon style={{fontSize:'20pt', color: 'blue'}} />
-                </IconButton>
+              {thumbsDown}
             </Grid>
-            <Grid item xs={8} sx={{transform: 'translate(1em ,0.5em) scale(1)'}}>By: {idNamePair.user} </Grid>
-            <Grid item xs={2} sx={{transform: 'translate(1.5em ,-0.55em) scale(1)'}}>{1} </Grid>
-            <Grid item xs={2} sx={{transform: 'translate(1.5em ,-0.55em) scale(1)'}}>{1} </Grid>
-            
-            {songCard} 
-            <Box sx={{ flexGrow: 1 }}>{buttonSet}</Box>
-            <Grid item xs={12} sx={{transform: 'translate(0em ,0.5em) scale(1)'}}> {editToolbar} </Grid>
-            <Grid item xs={8} sx={{transform: 'translate(1em ,0.5em) scale(1)'}}>Published: {idNamePair.date} </Grid>
+
+            <Grid item xs={8} sx={{transform: 'translate(1em ,0.5em) scale(1)'}}>By: {idNamePair.userName} </Grid>
+            <Grid item xs={2} sx={{transform: 'translate(1.5em ,-0.55em) scale(1)'}}>{numLikes} </Grid>
+            <Grid item xs={2} sx={{transform: 'translate(1.5em ,-0.55em) scale(1)'}}>{numDislikes} </Grid>
+
+            <Grid item xs={12} >{songCard} </Grid>
+
+            <Grid item xs={6} sx={{transform: 'translate(1.5em ,0.8em) scale(1)'}}>{buttonSet} </Grid>
+            <Grid item xs={6} sx={{transform: 'translate(4.7em ,0.8em) scale(1)'}}>{editToolbar} </Grid>
+
+            <Grid item xs={8} sx={{transform: 'translate(1em ,0.5em) scale(1)'}}>{publishDate}</Grid>
             <Grid item xs={2} sx={{transform: 'translate(-2em ,0.5em) scale(1)'}}>{'Listens:' + 10000} </Grid>
-            <Grid item xs={2} sx={{transform: 'translate(1em , 0em) scale(1)'}}> 
+            <Grid item xs={1} sx={{transform: 'translate(2em , 0.4em) scale(1)'}}> 
             <IconButton id = {"expand-" + idNamePair._id} 
                         onClick={toggleOpen} 
                         aria-label='expand'
@@ -210,11 +285,10 @@ function ListCard(props) {
                           backgroundColor: 'gray', opacity: [0.1, 0.1, 0.1],
                           color: 'white'},  borderRadius: 10 }}}
                         >
-                      {expand ? <ExpandLessIcon /> : <ExpandMoreIcon/>}
+                      {(decision) ? <ExpandLessIcon /> : <ExpandMoreIcon/>}
                     
                 </IconButton>
             </Grid>   
-            
         </Grid>
 
    
