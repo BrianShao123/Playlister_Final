@@ -58,11 +58,28 @@ deletePlaylist = async (req, res) => {
 
         // DOES THIS LIST BELONG TO THIS USER?
         async function asyncFindUser(list) {
+            
             User.findOne({ email: list.ownerEmail }, (err, user) => {
                 console.log("user._id: " + user._id);
                 console.log("req.userId: " + req.userId);
                 if (user._id == req.userId) {
                     console.log("correct user!");
+                    let temp = "";
+                    for(let i = 0; i < user.playlists.length; i ++)
+                    {
+                        if(user.playlists[i] == req.params.id)
+                        {
+                            temp = user.playlists
+                            temp.splice(i, 1);
+                            break; 
+                        }
+                        
+                    }
+                    console.log("temp is " + temp);
+                    user.playlists = temp;
+                    user
+                    .save();
+                    
                     Playlist.findOneAndDelete({ _id: req.params.id }, () => {
                         return res.status(200).json({success: true});
                     }).catch(err => console.log(err))
@@ -70,7 +87,7 @@ deletePlaylist = async (req, res) => {
                 else {
                     console.log("incorrect user!");
                     return res.status(400).json({ 
-                        errorMessage: "authentication error" 
+                        errorMessage: "authentication error",
                     });
                 }
             });

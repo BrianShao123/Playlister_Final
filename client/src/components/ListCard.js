@@ -256,7 +256,7 @@ function ListCard(props) {
     <Grid container rowSpacing={1}
       id = {"list-card-" + idNamePair._id}
       className={selectClass}
-      onClick = {handleSelectCard}
+      //onClick = {handleSelectCard}
       sx={{
         backgroundColor: 'red', borderRadius: 5, width: '95%',
         transform: 'translate(0em ,-1em) scale(1)', flex: 1, border: 1, marginTop: 2

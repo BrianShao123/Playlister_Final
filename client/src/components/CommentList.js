@@ -29,7 +29,7 @@ function CommentList() {
             <Grid container style = {{
                 width: '100%', 
                 backgroundColor: 'white', 
-                height: '25vw', 
+                height: '31.25vw', 
                 overflow: 'scroll', 
                 }}>
 
