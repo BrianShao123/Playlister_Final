@@ -30,7 +30,7 @@ import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
-
+import Comments from './CommentList';
 import YouTubePlayer from './YouTubePlayer';
 import MUIPublishModal from './MUIPublishModal';
 
@@ -87,24 +87,22 @@ import MUIPublishModal from './MUIPublishModal';
         store.loadIdNamePairs();
     }, []);
 
-    function handleSkipBackward() {
-
-    }
-
-    function handleStop() {
-
-    }
-
-    function handlePlay(){ 
-
-    }
-
-    function handleSkipForward() {
-
-    }
-
-
+    let video = "block";
+    let comments = "none";
     
+    if(value == 0) {
+      video = 'block'
+      comments = 'none'
+    }
+
+    if(value == 1)
+    {
+      video = 'none'
+      comments = 'block'
+    }
+
+
+
     function handleCreateNewList() {
         store.createNewList();
     }
@@ -177,6 +175,7 @@ import MUIPublishModal from './MUIPublishModal';
          </Box>
     }
     
+    
 
     let listCard = "";
     if (store) {
@@ -185,7 +184,6 @@ import MUIPublishModal from './MUIPublishModal';
                     <ListCard 
                         key={pair._id}
                         idNamePair={pair}
-                        //selected={false}
                     />
 
                 ))
@@ -291,7 +289,7 @@ import MUIPublishModal from './MUIPublishModal';
                 {
                    
                     //youtuber and comments tab
-                    <Box sx={{ width: '100%' }}>
+                  <Box sx={{ width: '100%' }}>
                     <Tabs 
                         value={value} 
                         onChange={handleChange}
@@ -301,16 +299,16 @@ import MUIPublishModal from './MUIPublishModal';
                             }
                           }}
                     >
-                        <Tab label="Player" sx={{bgcolor:'background.paper'}} {...a11yProps(0)}/>
+                        <Tab label="Player" sx={{bgcolor:'background.paper'}} {...a11yProps(0)} />
                         <Tab label="Comment" sx={{bgcolor:'background.paper'}} {...a11yProps(1)}/>
                     </Tabs>
-                      <TabPanel value={value} index={0}>
+                    <Box sx={{display:video}}> 
                       <YouTubePlayer/>
-                      </TabPanel>
-                      <TabPanel value={value} index={1}>
-                        Item Two
-                      </TabPanel>
                     </Box>
+                    <Box sx = {{display:comments}}>
+                      <Comments/>
+                    </Box>
+                  </Box>
                 }
             </div>
             {modalJSX}

@@ -21,10 +21,10 @@ body {
   background-color: var(--swatch-primary);
   font-family: "Lexend Exa";
   position: absolute;
-  width: 80%;
-  left: 10%;
-  height: 90%;
-  top: 5%;
+  width: 100%;
+  left: 0%;
+  height: 100%;
+  top: 0%;
 }
  /* 
 #app-root {
@@ -123,7 +123,7 @@ body {
 
 #sort {
   position: relative;
-  left: 42%;
+  left: 51%;
   height: 5%;
   
 }
@@ -219,6 +219,7 @@ path{
 }
 
 
+
 #youtube-player{
   position: absolute;
   left: 0%;
@@ -250,7 +251,11 @@ path{
   color: #666666;
   pointer-events: none;
 }
-
+.selected-list-card:hover {
+  cursor: pointer;
+  background-color: var(--swatch-contrast);
+  color: white;
+}
 
 .unselected-list-card:hover {
   cursor: pointer;
@@ -299,6 +304,11 @@ path{
 
 .unselected-list-card {
   background-color: var(--swatch-complement);
+}
+
+.selected-list-card {
+  background-color: var(--swatch-accent);
+  color: white;
 }
 
 .list-card-button {

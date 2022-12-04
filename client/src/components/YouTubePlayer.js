@@ -1,5 +1,4 @@
 
-import YouTubePlayerExample from './PlaylisterYouTubePlayer.js'
 import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
 import StopIcon from '@mui/icons-material/Stop';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -10,6 +9,7 @@ import IconButton from '@mui/material/IconButton';
 import { GlobalStoreContext } from '../store'
 import YouTube from 'react-youtube';
 import React, {useState, useContext} from 'react'
+import { Typography } from '@mui/material';
 
 function YouTubePlayer() {
     const { store } = useContext(GlobalStoreContext);
@@ -17,29 +17,23 @@ function YouTubePlayer() {
 
     //const [status] = useStatus(null);
 
-    let playlist =  
-    ["mqmxkGjow1A",
-    "8RbXIMZmVv8",
-    "8UbNbor3OqQ"];
-    
-    if(store.currentList) 
-    {
-        for(let i = 0; i < store.currentList.songs.length; i++)
-        {
-            playlist[i] = store.currentList.songs[i].youTubeId;
-        }
-
-    }
+    let playlist =  [];
+    let currentSong = 0;
+    let playerWindow = 
+    <Box sx = {{width: '20vw', transform: 'translate(12em ,10em) scale(1)'}}> 
+        <Typography> 
+            Start Playing
+        </Typography>
+    </Box>;
 
     
 
     // THIS IS THE INDEX OF THE SONG CURRENTLY IN USE IN THE PLAYLIST
-    let currentSong = 0;
 
     const playerOptions = {
         //flex: 1,
         height: '390',
-        width: '492',
+        width: '615',
         playerVars: {
             // https://developers.google.com/youtube/player_parameters
             autoplay: 0,
@@ -74,7 +68,7 @@ function YouTubePlayer() {
 
     function onPlayerReady(event) {
         loadAndPlayCurrentSong(event.target);
-        event.target.playVideo();
+        event.target.stopVideo();
     }
 
     // THIS IS OUR EVENT HANDLER FOR WHEN THE YOUTUBE PLAYER'S STATE
@@ -132,15 +126,26 @@ function YouTubePlayer() {
         //handleStop();
     }
 
-    return (
-    <Box>
-        <div id="youtube-player">
-        <YouTube
+    if(store.currentList && store.currentList.songs.length >= 1) 
+    {
+        for(let i = 0; i < store.currentList.songs.length; i++)
+        {
+            playlist[i] = store.currentList.songs[i].youTubeId;
+        }
+        playerWindow = 
+            <YouTube
             videoId={playlist[currentSong]}
             opts={playerOptions}
             onReady={onPlayerReady}
-            onStateChange={onPlayerStateChange} />
-        </div>
+            onStateChange={onPlayerStateChange} />;
+    }
+
+
+    return (
+    <Box>
+        
+            {playerWindow}
+        
         <div id="player-controller">
         <Box sx ={{borderColor: 'black', borderWidth: '2px', borderStyle: 'solid', borderRadius: 5}}>
         <IconButton onClick={handleSkipBackward} aria-label='backward'

@@ -104,7 +104,7 @@ export default function AppBanner() {
                     >
                         <Link style={{ textDecoration: 'none', color: 'Red' }} to='/'>Playlister</Link>
                     </Typography>
-                    <Box sx={{ display: { xs: 'none', md: 'flex' }, transform: 'translate(65vw ,0em) scale(1)'}}>
+                    <Box sx={{ display: { xs: 'none', md: 'flex' }, transform: 'translate(82vw ,0em) scale(1)'}}>
                         <IconButton
                             size="large"
                             edge="end"

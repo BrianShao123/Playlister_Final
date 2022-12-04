@@ -11,7 +11,6 @@ export default function HomeWrapper() {
     console.log("HomeWrapper auth.loggedIn: " + auth.loggedIn);
     
     if (auth.loggedIn){
-        store.clearTransactions();
         return <HomeScreen />
     }
     else
