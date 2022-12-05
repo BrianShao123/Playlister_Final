@@ -73,6 +73,7 @@ function ListCard(props) {
   }
 
   function toggleEdit(event) {
+    if(!idNamePair.published) {
     let newActive = !editActive;
     if (newActive) {
       let id = event.target.id;
@@ -80,6 +81,9 @@ function ListCard(props) {
       store.setIsListNameEditActive(id);
     }
     setEditActive(newActive);
+  }
+  else
+    console.log("Playlist is published. Can't Change Name")
   }
 
   function handleDeleteList(event) {
@@ -97,8 +101,12 @@ function ListCard(props) {
     console.log("marked publish id " + store.listIdMarkedForPublication);
   }
 
-  function handleCloneList() {
-
+  function handleCloneList(event) {
+    event.stopPropagation();
+    let id = event.target.id;
+    id = ("" + id).substring("clone-list-".length);
+    console.log(id); 
+    store.markListForDuplicate(id);
   }
 
   function handleKeyPress(event) {
@@ -173,7 +181,7 @@ function ListCard(props) {
     publishDate = "Published: " + idNamePair.publishDate;
   }
   if (store.currentList) {
-    if (store.currentList._id === idNamePair._id) {
+    if (store.currentList._id === idNamePair._id && !idNamePair.published) {
       editToolbar =
         <EditToolbar />;
       buttonSet =
@@ -189,14 +197,22 @@ function ListCard(props) {
             <PublishIcon />
           </Button>
           <Button
-            id='clone-list-button'
+            id={"clone-list-" + idNamePair._id}
             onClick={handleCloneList}
             variant="contained">
             <ContentCopyIcon />
           </Button>
         </Box>;
     }
-
+    else if (store.currentList._id === idNamePair._id && idNamePair.published)
+    {buttonSet =
+      <Button
+            id={"clone-list-" + idNamePair._id}
+            onClick={handleCloneList}
+            variant="contained">
+            <ContentCopyIcon />
+          </Button>
+    }
   }
   let decision = false;
 

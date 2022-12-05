@@ -39,7 +39,8 @@ export const GlobalStoreActionType = {
     SET_HOME: "SET_HOME",
     SET_ALL: "SET_ALL",
     SET_USERS: "SET_USERS",
-    SET_ID_NAME_PAIRS: "SET_ID_NAME_PAIRS"
+    SET_ID_NAME_PAIRS: "SET_ID_NAME_PAIRS",
+    MARK_LIST_FOR_DUPLICATE: "MARK_LIST_FOR_DUPLICATE"
     
 }
 const CurrentView = {
@@ -56,7 +57,8 @@ const CurrentModal = {
     EDIT_SONG : "EDIT_SONG",
     REMOVE_SONG : "REMOVE_SONG",
     ACCOUNT_ERROR_MODAL: "ACCOUNT_ERROR_MODAL",
-    PUBLISH_LIST: "PUBLISH_LIST"
+    PUBLISH_LIST: "PUBLISH_LIST",
+    DUPLICATE_LIST: "DUPLICATE_LIST"
 }
 
 const sort_by = (field, reverse, primer) => {
@@ -96,6 +98,8 @@ function GlobalStoreContextProvider(props) {
         listIdMarkedForPublication: null,
         listMarkedForPublication: null,
         currentSongPlayed: 0,
+        listIdMarkedForDuplicate: null,
+        listMarkedForDuplicate: null
 
     });
     const history = useHistory();
@@ -284,6 +288,24 @@ function GlobalStoreContextProvider(props) {
                     listIdMarkedForPublication: payload.id
                 });
             }
+            case GlobalStoreActionType.MARK_LIST_FOR_DUPLICATE: {
+                return setStore({
+                    currentModal : CurrentModal.DUPLICATE_LIST,
+                    idNamePairs: store.idNamePairs,
+                    currentList: payload.playlist,
+                    currentSongIndex: -1,
+                    currentSong: null,
+                    newListCounter: store.newListCounter,
+                    listNameActive: false,
+                    listIdMarkedForDeletion: null,
+                    listMarkedForDeletion: null,
+                    editSong: false,
+                    listMarkedForPublication: null,
+                    listIdMarkedForPublication: null,
+                    listIdMarkedForDuplicate: payload.id,
+                    listMarkedForDuplicate: payload.duplicate
+                });
+            }
             case GlobalStoreActionType.SET_CURRENT_SONG: {
                 return setStore({
                     currentModal : CurrentModal.NONE,
@@ -439,7 +461,7 @@ function GlobalStoreContextProvider(props) {
 
     // THIS FUNCTION CREATES A NEW LIST
     store.createNewList = async function () {
-        let newListName = "Untitled" + store.newListCounter;
+        let newListName = "Untitled";
         console.log(auth.user.userName);
         const response = await api.createPlaylist(auth.user.userName, newListName, [], auth.user.email, false, 0, 0, " ");
         //console.log("createNewList response: " + response);
@@ -563,6 +585,49 @@ function GlobalStoreContextProvider(props) {
         getListToDelete(id);
     }
 
+    store.markListForDuplicate = function (id) {
+        async function getListToDuplicate(id) {
+            let response = await api.getPlaylistById(id);
+            console.log(response.data.success);
+            if (response.data.success) {
+                let playlist = response.data.playlist;
+                storeReducer({
+                    type: GlobalStoreActionType.MARK_LIST_FOR_DUPLICATE,
+                    payload: {id: id, playlist: playlist, duplicate: playlist}
+                });
+            }
+        }
+        getListToDuplicate(id);
+    }
+
+    store.duplicateMarkedList = async function () {
+        let newListName = store.listMarkedForDuplicate.name;
+        console.log(newListName);
+        let songs = store.listMarkedForDuplicate.songs;
+        console.log(songs)
+        //console.log("GOT HERE")
+        const response = await api.createPlaylist(auth.user.userName, newListName, songs, auth.user.email, false, 0, 0, " ");
+        //console.log("createNewList response: " + response);
+        console.log(response.status);
+        if (response.status === 201) {
+            //console.log("In conditional")
+            //tps.clearAllTransactions();
+            let newList = response.data.playlist;
+            storeReducer({
+                type: GlobalStoreActionType.CREATE_NEW_LIST,
+                payload: newList
+            }
+            );
+            store.loadIdNamePairs(); 
+            // IF IT'S A VALID LIST THEN LET'S START EDITING IT
+            //history.push("/");
+        }
+        else {
+            console.log("API FAILED TO DUPLICATE A NEW LIST");
+        }
+    
+    }
+
     store.markListForPublication = function (id) {
         async function getListToPublish(id) {
             let response = await api.getPlaylistById(id);
@@ -587,9 +652,7 @@ function GlobalStoreContextProvider(props) {
         async function asyncUpdateListStatus() {
             const response = await api.updatePlaylist(store.currentList._id, store.currentList);
             console.log("current list id" + store.currentList._id);
-            //console.log("pairs " + idNamePairs);
             if (response.data.success) {
-                //console.log("Reducer Called")
                 storeReducer({
                     type: GlobalStoreActionType.SET_CURRENT_LIST,
                     payload: {playlist: response.playlist}
@@ -623,6 +686,10 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.unmarkListForPublication = function() {
+        store.hideModals();
+    }
+
+    store.unmarkListForDuplicate = function() {
         store.hideModals();
     }
 
@@ -718,6 +785,10 @@ function GlobalStoreContextProvider(props) {
         return store.currentModal === CurrentModal.PUBLISH_LIST;
     }
 
+    store.isDuplicateListModalOpen = () => {
+        return store.currentModal === CurrentModal.DUPLICATE_LIST;
+    }
+
 
     // THE FOLLOWING 8 FUNCTIONS ARE FOR COORDINATING THE UPDATING
     // OF A LIST, WHICH INCLUDES DEALING WITH THE TRANSACTION STACK. THE
@@ -781,7 +852,7 @@ function GlobalStoreContextProvider(props) {
         let temp = {username: store.getUserName(), comment: message};
         let newList = store.currentList;
         newList.comments.splice(store.currentList.comments.length, 0, temp);
-        store.updateCurrentList();
+        store.updateList();
 
     }
 

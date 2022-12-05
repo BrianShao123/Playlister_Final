@@ -26,11 +26,40 @@ createPlaylist = (req, res) => {
     }
 
     User.findOne({ _id: req.userId }, (err, user) => {
+        if(err)
+        {
+            console.log("User not found")
+        }
         console.log("user found: " + JSON.stringify(user));
+        let name = playlist.name; 
+        //console.log("NAME IS S S S S S " + name); 
+        console.log("FOUND");
+        async function addToAcc(user) {
+            
+        
+        let found = await Playlist.findOne({
+            name: name,
+            ownerEmail: user.email
+        })
+        i = 0
+        //console.log(user.email + " " + name);
+        //console.log("FOUND IS " + JSON.stringify(found));
+        while(found) {
+            name = `${playlist.name} (${++i})`;
+            //console.log(name);
+            //console.log(user.email);
+            found = await Playlist.findOne({
+                name: name,
+                ownerEmail: user.email
+            })
+        }
+        playlist.name = name;
+    
         user.playlists.push(playlist._id);
         user
             .save()
             .then(() => {
+                console.log("PLAYLIST IS " + playlist)
                 playlist
                     .save()
                     .then(() => {
@@ -40,12 +69,16 @@ createPlaylist = (req, res) => {
                     })
                     .catch(error => {
                         return res.status(400).json({
-                            errorMessage: JSON.stringify(error),
+                            errorMessage: 'Playlist Not Created!'
                         })
                     })
             });
-    })
+            }
+            addToAcc(user);
+        })
+        
 }
+
 deletePlaylist = async (req, res) => {
     console.log("delete Playlist with id: " + JSON.stringify(req.params.id));
     console.log("delete " + req.params.id);

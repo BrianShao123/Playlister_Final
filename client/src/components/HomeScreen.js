@@ -33,7 +33,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Comments from './CommentList';
 import YouTubePlayer from './YouTubePlayer';
 import MUIPublishModal from './MUIPublishModal';
-import YouTube from 'react-youtube';
+import MUIDuplicateModal from './MUIDuplicateModal';
 
 /*
     This React component lists all the top5 lists in the UI.
@@ -245,6 +245,9 @@ import YouTube from 'react-youtube';
     }
     else if(store.currentModal == "PUBLISH_LIST") {
       modalJSX = <MUIPublishModal/>
+    }
+    else if(store.currentModal == "DUPLICATE_LIST") {
+      modalJSX = <MUIDuplicateModal/>
     }
     return (
       <Box> 
