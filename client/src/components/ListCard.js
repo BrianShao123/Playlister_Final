@@ -140,6 +140,7 @@ function ListCard(props) {
   let editToolbar = "";
   let buttonSet = "";
   let publishDate = "";
+  //console.log(idNamePair.published);
   if (idNamePair.published) {
     thumbsUp =
       <IconButton onClick={openCurrentList} aria-label='edit'
@@ -259,7 +260,7 @@ function ListCard(props) {
       //onClick = {handleSelectCard}
       sx={{
         backgroundColor: 'red', borderRadius: 5, width: '95%',
-        transform: 'translate(0em ,-1em) scale(1)', flex: 1, border: 1, marginTop: 2
+        transform: 'translate(0em ,-1em) scale(1)', display: 'flex', border: 1, marginTop: 2
       }}
     >
       <Grid item xs={8} sx={{ transform: 'translate(1em ,0.5em) scale(1)' }}

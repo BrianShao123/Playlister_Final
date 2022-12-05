@@ -1,3 +1,4 @@
+import zIndex from '@mui/material/styles/zIndex';
 import React, { useContext, useState } from 'react'
 import { GlobalStoreContext } from '../store'
 
@@ -68,7 +69,7 @@ function SongCard(props) {
     return (
         <div
             key={index}
-            id={'song-' + index + '-card'}
+            id={'song-card-' + index}
             className={selectClass}
             onDragStart={handleDragStart}
             onDragOver={handleDragOver}

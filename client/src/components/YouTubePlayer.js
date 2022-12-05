@@ -11,10 +11,10 @@ import YouTube from 'react-youtube';
 import React, {useState, useContext} from 'react'
 import { Typography } from '@mui/material';
 
-function YouTubePlayer() {
+function YouTubePlayer(props) {
     const { store } = useContext(GlobalStoreContext);
     const [holdPlayer, setPlayer] = useState(null);
-
+    const [current, setCurrent] = useState(0);
     //const [status] = useStatus(null);
 
     let playlist =  [];
@@ -32,7 +32,7 @@ function YouTubePlayer() {
 
     const playerOptions = {
         //flex: 1,
-        height: '390',
+        height: '340',
         width: '615',
         playerVars: {
             // https://developers.google.com/youtube/player_parameters
@@ -57,13 +57,23 @@ function YouTubePlayer() {
 
     // THIS FUNCTION INCREMENTS THE PLAYLIST SONG TO THE NEXT ONE
     function incSong() {
-        currentSong++;
-        currentSong = currentSong % playlist.length;
+        currentSong = current + 1;
+        console.log("current is " + currentSong)
+        let size = store.getPlaylistSize();
+        //console.log("size is " + size);
+        currentSong = currentSong%size;
+        //console.log("current is " + currentSong)
+        setCurrent(currentSong);
     }
 
     function decSong() {
-        currentSong--;
-        currentSong = currentSong%playlist.length;
+        currentSong = current -1 ;
+        let size = store.getPlaylistSize();
+        if(currentSong == -1)
+            currentSong = size -1;
+        //currentSong = currentSong%size;
+        //console.log("current" + currentSong);
+        setCurrent(currentSong);
     }
 
     function onPlayerReady(event) {
@@ -110,6 +120,7 @@ function YouTubePlayer() {
         decSong();
         loadAndPlayCurrentSong(holdPlayer);
         //handleStop();
+        store.loadIdNamePairs();
     }
 
     function handleStop() {
@@ -123,21 +134,33 @@ function YouTubePlayer() {
     function handleSkipForward() {
         incSong();
         loadAndPlayCurrentSong(holdPlayer);
-        //handleStop();
+        store.loadIdNamePairs();
     }
-
-    if(store.currentList && store.currentList.songs.length >= 1) 
+    
+    if(store.currentList && store.currentList.songs.length >=   1) 
     {
-        for(let i = 0; i < store.currentList.songs.length; i++)
+        //console.log("song length is " + store.getPlaylistSize())
+        //console.log(current);
+        for(let i = 0; i < store.getPlaylistSize(); i++)
         {
+            //console.log("RUNRUN")
+            //console.log(i)
             playlist[i] = store.currentList.songs[i].youTubeId;
         }
+        //console.log(playlist)
         playerWindow = 
+        <Box> 
             <YouTube
             videoId={playlist[currentSong]}
             opts={playerOptions}
             onReady={onPlayerReady}
-            onStateChange={onPlayerStateChange} />;
+            onStateChange={onPlayerStateChange} />
+            <Typography  variant = 'h5' sx ={{transform: 'translate(16vw ,0em) scale(1)', width: '50%', fontWeight: 'bold'}}> Now Playing</Typography>
+            <Typography sx ={{fontWeight: 'bold'}}> Playlist: {store.currentList.name} </Typography>
+            <Typography sx ={{fontWeight: 'bold'}}> Song #: {current+1} </Typography>
+            <Typography sx ={{fontWeight: 'bold'}}> Song Title: {store.currentList.songs[current].title} </Typography>
+            <Typography sx ={{fontWeight: 'bold'}}> Song Artist: {store.currentList.songs[current].artist} </Typography>
+        </Box>;
     }
 
 
@@ -145,7 +168,6 @@ function YouTubePlayer() {
     <Box>
         
             {playerWindow}
-        
         <div id="player-controller">
         <Box sx ={{borderColor: 'black', borderWidth: '2px', borderStyle: 'solid', borderRadius: 5}}>
         <IconButton onClick={handleSkipBackward} aria-label='backward'

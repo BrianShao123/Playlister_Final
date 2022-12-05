@@ -1,7 +1,7 @@
 import React, {useState, useContext} from 'react'
 import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
-import { Grid, TextField} from '@mui/material';
+
+import {TextField, Typography} from '@mui/material';
 import { GlobalStoreContext } from '../store'
 import SendIcon from '@mui/icons-material/Send';
 import Button from '@mui/material/Button';
@@ -12,22 +12,37 @@ function CommentList() {
     const [comment, setComment] = useState("");
 
     let commentCard = "";
-
+    let inputBar = "";
 
     function handleSendComment() {
         let send = comment;
-        
+        if(comment != "")
+            store.addComment(send);
+        setComment("");
     }
+
+  
 
     function handleCommentUpdate(event) {
         setComment(event.target.value);
     }
 
+    function handleKeyPress(event) {
+        if (event.code === "Enter" && comment) {
+            let send = comment;
+            if(comment != "")
+                store.addComment(send);
+            setComment("");
+          }
+    }
+
 
     if(store.currentList){
         commentCard = 
-            <Grid container style = {{
-                width: '100%', 
+            <Box container style = {{
+                //width: '100%',
+                display: 'flex',
+                flexDirection:'column',
                 backgroundColor: 'white', 
                 height: '31.25vw', 
                 overflow: 'scroll', 
@@ -35,22 +50,30 @@ function CommentList() {
 
                 {
                     store.currentList.comments.map((comment) => (
-                        <Box>
-                            <Grid item xs={12}>
-                                {store.currentList.name}
-                            </Grid>
-                            <Grid> 
-                                {comment}
-                            </Grid>
+                        <Box container sx ={{
+                            backgroundColor: 'lightBlue', 
+                            m: 1,
+                            p: 1,
+                            borderRadius: 2, 
+                            marginTop: 2, 
+                            display: 'flex',
+                           }}>
+                            <Box> 
+                                <Typography component="div" variant="h7" sx={{paddingBottom: 1, color: 'blue'}}>
+                                    {store.getUserName()} :
+                                </Typography>
+
+                                <Typography component="div" sx={{display:'flex', wordBreak: 'break-word'}}>
+                                <Box >
+                                    {comment}
+                                </Box>
+                                </Typography>
+                                </Box>
                         </Box>
                     ))  
                 }
-            </Grid>
-        }
-
-    return (
-        <Box> 
-            {commentCard}
+            </Box>;
+        inputBar = 
             <div id="comment-bar"> 
                 <TextField 
                     id="outlined-basic" 
@@ -59,6 +82,8 @@ function CommentList() {
                     //InputProps={{ startAdornment: <SearchIcon/> }}
                     sx={{ backgroundColor: 'white', width: '35vw' }}
                     onChange ={handleCommentUpdate}
+                    onKeyPress={handleKeyPress}
+                    value = {comment}
                 />
                 <Button 
                     id = {"send-comment-" + 2}
@@ -69,6 +94,12 @@ function CommentList() {
                     <SendIcon sx={{ fontSize: 40 }}/>
                 </Button>
             </div>
+        }
+
+    return (
+        <Box> 
+            {commentCard}
+            {inputBar}
         </Box>
 
 

@@ -33,6 +33,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Comments from './CommentList';
 import YouTubePlayer from './YouTubePlayer';
 import MUIPublishModal from './MUIPublishModal';
+import YouTube from 'react-youtube';
 
 /*
     This React component lists all the top5 lists in the UI.
@@ -101,6 +102,21 @@ import MUIPublishModal from './MUIPublishModal';
       comments = 'block'
     }
 
+    function changeToHome() {
+      store.setViewHome()
+      console.log("View is " + store.currentView);
+      //console.log("modal is " + store.currentModal);
+    }
+
+    function changeToAll() {
+      store.setViewAll()
+      console.log(store.currentView);
+    }
+
+    function changeToUsers() {
+      store.setViewUsers()
+      console.log(store.currentView)
+    }
 
 
     function handleCreateNewList() {
@@ -189,6 +205,7 @@ import MUIPublishModal from './MUIPublishModal';
                 ))
                 
     }
+
     let modalJSX = "";
     if(store.songMarkedForDeletion) {
       modalJSX = <MUIRemoveSongModal/>;
@@ -206,47 +223,35 @@ import MUIPublishModal from './MUIPublishModal';
       <Box> 
             <AppBar position="static" elevation={0} sx={{ height: '10%'}}  style={{ background: '#e6e6e6' }}>
             <Toolbar>
-                    <Typography                        
-                        variant="h4"
-                        noWrap
-                        component="div"
-                        sx={{ display: { xs: 'none', sm: 'block',  backgroundColor: '#12345',
-                        '&:hover': {
-                          backgroundColor: 'white',
-                          opacity: [0.9, 0.8, 0.7],  }, borderRadius: 100 } }}                        
-                    >
-                        <Link style={{ textDecoration: 'none', color: 'black' }} to='/'>
-                            <HomeIcon sx={{ fontSize: "120%" }}></HomeIcon>
-                        </Link>
-                        </Typography>
+                    
+                        <IconButton 
+                        id = 'home'
+                        style={{ textDecoration: 'none', color: 'black' }}
+                        onClick = {changeToHome}
+                        >
+                            <HomeIcon sx={{ fontSize: "3vw" }}></HomeIcon>
+                        </IconButton>
                         
-                        <Typography                        
-                        variant="h4"
-                        noWrap
-                        component="div"
-                        sx={{ display: { xs: 'none', sm: 'block',  backgroundColor: '#12345',
-                        '&:hover': {
-                          backgroundColor: 'white',
-                          opacity: [0.9, 0.8, 0.7],  }, borderRadius: 100 } }}                        
-                    >
-                        <Link style={{ textDecoration: 'none', color: 'black' }} to='/'>
-                            <GroupsIcon sx={{ fontSize: "150%"}}></GroupsIcon>
-                        </Link>
-                        </Typography>
+                        
+                        
+                        <IconButton 
+                        id = 'all' 
+                        style={{ textDecoration: 'none', color: 'black' }}
+                        onClick = {changeToAll}
+                        >
+                            <GroupsIcon sx={{ fontSize: "3vw"}}></GroupsIcon>
+                        </IconButton>
+                        
 
-                        <Typography                        
-                        variant="h4"
-                        noWrap
-                        component="div"
-                        sx={{ display: { xs: 'none', sm: 'block',  backgroundColor: '#12345',
-                        '&:hover': {
-                          backgroundColor: 'white',
-                          opacity: [0.9, 0.8, 0.7],  }, borderRadius: 100 } }}                        
-                    >
-                        <Link style={{ textDecoration: 'none', color: 'black' }} to='/'>
-                            <PersonIcon sx={{ fontSize: "120%" }}> </PersonIcon>
-                        </Link>
-                    </Typography>
+                        
+                        <IconButton 
+                        id = 'user' 
+                        style={{ textDecoration: 'none', color: 'black' }}
+                        onClick = {changeToUsers}
+                        >
+                            <PersonIcon sx={{ fontSize: "3vw" }}> </PersonIcon>
+                        </IconButton>
+                   
                     <div id="search-bar"> 
                     <TextField id="outlined-basic" 
                         label="Search" 
@@ -303,7 +308,7 @@ import MUIPublishModal from './MUIPublishModal';
                         <Tab label="Comment" sx={{bgcolor:'background.paper'}} {...a11yProps(1)}/>
                     </Tabs>
                     <Box sx={{display:video}}> 
-                      <YouTubePlayer/>
+                        <YouTubePlayer/>
                     </Box>
                     <Box sx = {{display:comments}}>
                       <Comments/>
