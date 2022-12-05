@@ -51,7 +51,6 @@ import YouTube from 'react-youtube';
     
     function TabPanel(props) {
       const { children, value, index, ...other } = props;
-
       return (
         <div
           role="tabpanel"
@@ -67,7 +66,6 @@ import YouTube from 'react-youtube';
           )}
         </div>
       );
-    
     
     }
     
@@ -140,6 +138,8 @@ import YouTube from 'react-youtube';
     const handleSortMenuClose = () => {
         setAnchorEl(null);
     };
+
+
     const sortMenuId = 'sort-menu';
     const sortMenu = (
       <Menu
@@ -157,13 +157,20 @@ import YouTube from 'react-youtube';
           open={isMenuOpen}
           onClose={handleSortMenuClose}
       >
-          <MenuItem onClick={handleSortMenuClose}>Name (A-Z)</MenuItem>
+          <MenuItem onClick={handleAlphabetSort}>Name (A-Z)</MenuItem>
           <MenuItem onClick={handleSortMenuClose}>Publish Dates (Newest)</MenuItem>
           <MenuItem onClick={handleSortMenuClose}>Listens (High-Low)</MenuItem>
           <MenuItem onClick={handleSortMenuClose}>Likes (High-Low)</MenuItem>
           <MenuItem onClick={handleSortMenuClose}>Dislike (High-Low)</MenuItem>
       </Menu>
     );
+
+    function handleAlphabetSort() {
+      store.sortAlphabetically();
+      handleSortMenuClose();
+    }
+
+
 
     let songCard = "";
     if(store.currentList) {

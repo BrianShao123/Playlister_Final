@@ -60,12 +60,12 @@ function CommentList() {
                            }}>
                             <Box> 
                                 <Typography component="div" variant="h7" sx={{paddingBottom: 1, color: 'blue'}}>
-                                    {store.getUserName()} :
+                                    {comment.username} :
                                 </Typography>
 
                                 <Typography component="div" sx={{display:'flex', wordBreak: 'break-word'}}>
                                 <Box >
-                                    {comment}
+                                    {comment.comment}
                                 </Box>
                                 </Typography>
                                 </Box>

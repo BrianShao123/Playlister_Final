@@ -38,7 +38,8 @@ export const GlobalStoreActionType = {
     SET_CURRENT_SONG: "SET_CURRENT_SONG",
     SET_HOME: "SET_HOME",
     SET_ALL: "SET_ALL",
-    SET_USERS: "SET_USERS"
+    SET_USERS: "SET_USERS",
+    SET_ID_NAME_PAIRS: "SET_ID_NAME_PAIRS"
     
 }
 const CurrentView = {
@@ -57,6 +58,24 @@ const CurrentModal = {
     ACCOUNT_ERROR_MODAL: "ACCOUNT_ERROR_MODAL",
     PUBLISH_LIST: "PUBLISH_LIST"
 }
+
+const sort_by = (field, reverse, primer) => {
+
+    const key = primer ?
+      function(x) {
+        return primer(x[field])
+      } :
+      function(x) {
+        return x[field]
+      };
+  
+    reverse = !reverse ? 1 : -1;
+  
+    return function(a, b) {
+      return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
+    }
+  }
+
 
 // WITH THIS WE'RE MAKING OUR GLOBAL DATA STORE
 // AVAILABLE TO THE REST OF THE APPLICATION
@@ -147,6 +166,23 @@ function GlobalStoreContextProvider(props) {
             }
             // GET ALL THE LISTS SO WE CAN PRESENT THEM
             case GlobalStoreActionType.LOAD_ID_NAME_PAIRS: {
+                return setStore({
+                    currentModal : CurrentModal.NONE,
+                    idNamePairs: payload,
+                    currentList: store.currentList,
+                    currentSongIndex: -1,
+                    currentSong: null,
+                    newListCounter: store.newListCounter,
+                    listNameActive: false,
+                    listIdMarkedForDeletion: null,
+                    listMarkedForDeletion: null,
+                    editSong: false,
+                    listIdMarkedForPublication: null,
+                    listMarkedForPublication: null,
+                    currentView: store.currentView
+                });
+            }
+            case GlobalStoreActionType.SET_ID_NAME_PAIRS: {
                 return setStore({
                     currentModal : CurrentModal.NONE,
                     idNamePairs: payload,
@@ -590,6 +626,18 @@ function GlobalStoreContextProvider(props) {
         store.hideModals();
     }
 
+    store.sortAlphabetically = function() {
+        console.log("ran")
+        let temp = store.idNamePairs;
+        console.log(temp.sort(sort_by('name', false, (a) =>  a.toUpperCase())));
+        console.log(temp);
+        storeReducer({
+            type: GlobalStoreActionType.SET_ID_NAME_PAIRS,
+            payload: temp
+        }); 
+        //store.loadIdNamePairs();
+    }
+
     // THIS FUNCTION SHOWS THE MODAL FOR PROMPTING THE USER
     // TO SEE IF THEY REALLY WANT TO DELETE THE LIST
 
@@ -624,6 +672,7 @@ function GlobalStoreContextProvider(props) {
     store.isPublishListModalOpen = () => {
         return store.currentModal === CurrentModal.PUBLISH_LIST;
     }
+
 
     // THE FOLLOWING 8 FUNCTIONS ARE FOR COORDINATING THE UPDATING
     // OF A LIST, WHICH INCLUDES DEALING WITH THE TRANSACTION STACK. THE
@@ -684,8 +733,9 @@ function GlobalStoreContextProvider(props) {
     }
 
     store.addComment = function (message) {
+        let temp = {username: store.getUserName(), comment: message};
         let newList = store.currentList;
-        newList.comments.push(message);
+        newList.comments.splice(store.currentList.comments.length, 0, temp);
         store.updateCurrentList();
 
     }
