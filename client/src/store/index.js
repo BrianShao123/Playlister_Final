@@ -638,6 +638,51 @@ function GlobalStoreContextProvider(props) {
         //store.loadIdNamePairs();
     }
 
+    store.sortByPublicationDate = function () {
+        let temp = store.idNamePairs;
+      
+        console.log(temp.sort(sort_by('publishDate', true)));
+        
+        console.log(temp);
+        storeReducer({
+            type: GlobalStoreActionType.SET_ID_NAME_PAIRS,
+            payload: temp
+        }); 
+    }
+
+    store.sortByListens = function () {
+        let temp = store.idNamePairs;
+        console.log(temp.sort(sort_by('listens', false)));
+        let test = [{name: 4}, {name: 2}]
+        console.log(test.sort(sort_by('name', false)));
+        storeReducer({
+            type: GlobalStoreActionType.SET_ID_NAME_PAIRS,
+            payload: temp
+        }); 
+    }
+
+    store.sortByLikes = function () {
+        let temp = store.idNamePairs;
+        console.log(temp.sort(sort_by('likes', false)));
+        console.log(temp);
+        storeReducer({
+            type: GlobalStoreActionType.SET_ID_NAME_PAIRS,
+            payload: temp
+        }); 
+    }
+    
+    store.sortByDislikes = function () {
+        let temp = store.idNamePairs;
+        console.log(temp.sort(sort_by('disLikes', false)));
+        console.log(temp);
+        storeReducer({
+            type: GlobalStoreActionType.SET_ID_NAME_PAIRS,
+            payload: temp
+        }); 
+    }
+
+
+
     // THIS FUNCTION SHOWS THE MODAL FOR PROMPTING THE USER
     // TO SEE IF THEY REALLY WANT TO DELETE THE LIST
 

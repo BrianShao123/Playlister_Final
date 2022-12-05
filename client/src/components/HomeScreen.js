@@ -158,15 +158,35 @@ import YouTube from 'react-youtube';
           onClose={handleSortMenuClose}
       >
           <MenuItem onClick={handleAlphabetSort}>Name (A-Z)</MenuItem>
-          <MenuItem onClick={handleSortMenuClose}>Publish Dates (Newest)</MenuItem>
-          <MenuItem onClick={handleSortMenuClose}>Listens (High-Low)</MenuItem>
-          <MenuItem onClick={handleSortMenuClose}>Likes (High-Low)</MenuItem>
-          <MenuItem onClick={handleSortMenuClose}>Dislike (High-Low)</MenuItem>
+          <MenuItem onClick={handlePublicationSort}>Publish Dates (Newest)</MenuItem>
+          <MenuItem onClick={handleListenSort}>Listens (High-Low)</MenuItem>
+          <MenuItem onClick={handleLikeSort}>Likes (High-Low)</MenuItem>
+          <MenuItem onClick={handleDislikeSort}>Dislike (High-Low)</MenuItem>
       </Menu>
     );
 
     function handleAlphabetSort() {
       store.sortAlphabetically();
+      handleSortMenuClose();
+    }
+
+    function handlePublicationSort() {
+      store.sortByPublicationDate();
+      handleSortMenuClose();
+    }
+
+    function handleListenSort() {
+      store.sortByListens();
+      handleSortMenuClose();
+    }
+
+    function handleLikeSort() {
+      store.sortByLikes();
+      handleSortMenuClose();
+    }
+
+    function handleDislikeSort() {
+      store.sortByDislikes();
       handleSortMenuClose();
     }
 
