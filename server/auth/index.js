@@ -4,9 +4,11 @@ function authManager() {
     verify = (req, res, next) => {
         console.log("req: " + req);
         console.log("next: " + next);
-        console.log("Who called verify?");
+        //console.log("Who called verify?");
         try {
             const token = req.cookies.token;
+            console.log("TOKEN IS " + token);
+            console.log(!token);
             if (!token) {
                 return res.status(401).json({
                     loggedIn: false,
@@ -21,13 +23,9 @@ function authManager() {
 
             next();
         } catch (err) {
-            console.error(err);
-            return res.status(401).json({
-                loggedIn: false,
-                user: null,
-                errorMessage: "Unauthorized"
-            });
-        }
+            next()
+            };
+        
     }
 
     verifyUser = (req) => {

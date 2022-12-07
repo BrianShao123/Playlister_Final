@@ -16,18 +16,20 @@ import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import MUIAccountErrorModal from './MUIAccountErrorModal';
+//import { GlobalStoreContext } from '../store'
 
 export default function LoginScreen() {
     const { auth } = useContext(AuthContext);
+    //const { store } = useContext(GlobalStoreContext);
 
     const handleSubmit = (event) => {
         event.preventDefault();
+        //store.setViewHome();
         const formData = new FormData(event.currentTarget);
         auth.loginUser(
             formData.get('email'),
             formData.get('password')
         );
-
     };
 
     let modalJSX = "";

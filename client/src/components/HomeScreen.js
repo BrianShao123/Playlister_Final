@@ -13,7 +13,6 @@ import Tab from '@mui/material/Tab';
 import Toolbar from '@mui/material/Toolbar';
 import AppBar from '@mui/material/AppBar';
 import TextField from '@mui/material/TextField';
-import { Link } from 'react-router-dom'
 import GroupsIcon from '@mui/icons-material/Groups';
 import HomeIcon from '@mui/icons-material/Home';
 import PersonIcon from '@mui/icons-material/Person';
@@ -30,7 +29,7 @@ import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
-import Comments from './CommentList';
+import CommentList from './CommentList';
 import YouTubePlayer from './YouTubePlayer';
 import MUIPublishModal from './MUIPublishModal';
 import MUIDuplicateModal from './MUIDuplicateModal';
@@ -46,6 +45,7 @@ import MUIDuplicateModal from './MUIDuplicateModal';
     const { store } = useContext(GlobalStoreContext);
     const [value, setValue] = React.useState(0);
     const [anchorEl, setAnchorEl] = useState(null);
+    const [searchRequest, setSearchRequest] = useState("");
     const isMenuOpen = Boolean(anchorEl);
     store.history = useHistory();
     
@@ -83,7 +83,12 @@ import MUIDuplicateModal from './MUIDuplicateModal';
     }
 
     useEffect(() => {
-        store.loadIdNamePairs();
+      
+      if(store.getUserName() != "GuestJoefpNhX925k4")
+        store.setViewHome();
+      else
+      
+        store.setViewAll();
     }, []);
 
     let video = "block";
@@ -139,6 +144,19 @@ import MUIDuplicateModal from './MUIDuplicateModal';
         setAnchorEl(null);
     };
 
+    function handleSearchUpdate(event) {
+      setSearchRequest(event.target.value);
+  }
+
+  function handleKeyPress(event) {
+      if (event.code === "Enter" && searchRequest) {
+          let send = searchRequest;
+          if(send != "")
+              store.searchQuery(send);
+          setSearchRequest("");
+        }
+  }
+
 
     const sortMenuId = 'sort-menu';
     const sortMenu = (
@@ -190,7 +208,41 @@ import MUIDuplicateModal from './MUIDuplicateModal';
       handleSortMenuClose();
     }
 
-
+    let guestCheck = 1;
+    let addList = "";
+    let homeSelect = 0;
+    let allSelect = 0;
+    let usersSelect = 0;
+    if(store.currentView == "HOME") 
+    {
+      homeSelect = 1;
+      addList = 
+      <Box> 
+        <Fab 
+          color="primary" 
+          aria-label="add"
+          id="add-list-button"
+          onClick={handleCreateNewList}
+          sx ={{transform: 'translate(2em ,0.5em) scale(1)'}}
+        >
+            <AddIcon />
+        </Fab>
+        <Typography variant="h2" sx={{ width: '30vw', fontSize: '8vh'}}>
+          Your Lists
+        </Typography>
+      </Box>
+    }
+    if(store.currentView == "ALL")
+    {
+      allSelect = 1;
+    }
+    if(store.currentView == "USERS")
+    {
+      usersSelect = 1;
+    }
+    if(store.getUserName() == "GuestJoefpNhX925k4") {
+      guestCheck = 0;
+    }
 
     let songCard = "";
     if(store.currentList) {
@@ -258,8 +310,9 @@ import MUIDuplicateModal from './MUIDuplicateModal';
                         id = 'home'
                         style={{ textDecoration: 'none', color: 'black' }}
                         onClick = {changeToHome}
+                        disabled={guestCheck === 0}
                         >
-                            <HomeIcon sx={{ fontSize: "3vw" }}></HomeIcon>
+                            <HomeIcon sx={{ fontSize: "3vw", border: homeSelect, opacity: guestCheck}} ></HomeIcon>
                         </IconButton>
                         
                         
@@ -269,7 +322,7 @@ import MUIDuplicateModal from './MUIDuplicateModal';
                         style={{ textDecoration: 'none', color: 'black' }}
                         onClick = {changeToAll}
                         >
-                            <GroupsIcon sx={{ fontSize: "3vw"}}></GroupsIcon>
+                            <GroupsIcon sx={{ fontSize: "3vw", border: allSelect}}></GroupsIcon>
                         </IconButton>
                         
 
@@ -279,7 +332,7 @@ import MUIDuplicateModal from './MUIDuplicateModal';
                         style={{ textDecoration: 'none', color: 'black' }}
                         onClick = {changeToUsers}
                         >
-                            <PersonIcon sx={{ fontSize: "3vw" }}> </PersonIcon>
+                            <PersonIcon sx={{ fontSize: "3vw", border: usersSelect }}> </PersonIcon>
                         </IconButton>
                    
                     <div id="search-bar"> 
@@ -288,6 +341,9 @@ import MUIDuplicateModal from './MUIDuplicateModal';
                         variant="outlined" 
                         InputProps={{ startAdornment: <SearchIcon/> }}
                         sx={{ backgroundColor: 'white', width: '30vw' }}
+                        onChange ={handleSearchUpdate}
+                        onKeyPress={handleKeyPress}
+                        value = {searchRequest}
                         />
                     </div>
                     <div id="sort">
@@ -304,15 +360,7 @@ import MUIDuplicateModal from './MUIDuplicateModal';
 
             </AppBar>
             <div id="list-selector-heading">
-            <Fab 
-                color="primary" 
-                aria-label="add"
-                id="add-list-button"
-                onClick={handleCreateNewList}
-            >
-                <AddIcon />
-            </Fab>
-                <Typography variant="h2" sx={{ width: '20vw', fontSize: '8vh'}}>Your Lists</Typography>
+              {addList}
             </div>
             <div id="list-selector-list">
                 {
@@ -341,7 +389,7 @@ import MUIDuplicateModal from './MUIDuplicateModal';
                         <YouTubePlayer/>
                     </Box>
                     <Box sx = {{display:comments}}>
-                      <Comments/>
+                      <CommentList/>
                     </Box>
                   </Box>
                 }

@@ -20,7 +20,7 @@ function YouTubePlayer(props) {
     let playlist =  [];
     let currentSong = 0;
     let playerWindow = 
-    <Box sx = {{width: '20vw', transform: 'translate(12em ,10em) scale(1)'}}> 
+    <Box sx = {{width: '20vw', transform: 'translate(15em ,10em) scale(1)'}}> 
         <Typography> 
             Start Playing
         </Typography>
@@ -114,16 +114,23 @@ function YouTubePlayer(props) {
         }
     }
 
+    let time = 0
 
-    
     function handleSkipBackward() {
         decSong();
         loadAndPlayCurrentSong(holdPlayer);
         //handleStop();
-        store.loadIdNamePairs();
+        //store.loadIdNamePairs();
     }
 
     function handleStop() {
+        let time = holdPlayer.getCurrentTime();
+        console.log(time);
+        if(time >= 30)
+        {
+            //console.log("TTTTT");
+            store.incrementListens();
+        }
         holdPlayer.stopVideo();
     }
 
@@ -134,9 +141,10 @@ function YouTubePlayer(props) {
     function handleSkipForward() {
         incSong();
         loadAndPlayCurrentSong(holdPlayer);
-        store.loadIdNamePairs();
+        //store.loadIdNamePairs();
     }
     
+    let temp = current;
     if(store.currentList && store.currentList.songs.length >=   1) 
     {
         //console.log("song length is " + store.getPlaylistSize())
@@ -147,6 +155,11 @@ function YouTubePlayer(props) {
             //console.log(i)
             playlist[i] = store.currentList.songs[i].youTubeId;
         }
+
+        if(current >= store.currentList.songs.length){
+            temp = 0;
+        }
+        console.log(temp);
         //console.log(playlist)
         playerWindow = 
         <Box> 
@@ -155,51 +168,52 @@ function YouTubePlayer(props) {
             opts={playerOptions}
             onReady={onPlayerReady}
             onStateChange={onPlayerStateChange} />
-            <Typography  variant = 'h5' sx ={{transform: 'translate(16vw ,0em) scale(1)', width: '50%', fontWeight: 'bold'}}> Now Playing</Typography>
+            <Typography  variant = 'h5' sx ={{transform: 'translate(15vw ,0em) scale(1)', width: '50%', fontWeight: 'bold'}}> Now Playing</Typography>
             <Typography sx ={{fontWeight: 'bold'}}> Playlist: {store.currentList.name} </Typography>
-            <Typography sx ={{fontWeight: 'bold'}}> Song #: {current+1} </Typography>
-            <Typography sx ={{fontWeight: 'bold'}}> Song Title: {store.currentList.songs[current].title} </Typography>
-            <Typography sx ={{fontWeight: 'bold'}}> Song Artist: {store.currentList.songs[current].artist} </Typography>
-        </Box>;
+            <Typography sx ={{fontWeight: 'bold'}}> Song #: {temp+1} </Typography>
+            <Typography sx ={{fontWeight: 'bold'}}> Song Title: {store.currentList.songs[temp].title} </Typography>
+            <Typography sx ={{fontWeight: 'bold'}}> Song Artist: {store.currentList.songs[temp].artist} </Typography>
+            <div id="player-controller">
+            <Box sx ={{borderColor: 'black', borderWidth: '2px', borderStyle: 'solid', borderRadius: 5}}>
+                <IconButton onClick={handleSkipBackward} aria-label='backward'
+                    sx = {{display: { backgroundColor: '#12345',
+                    '&:hover': {
+                        backgroundColor: 'gray',
+                        color: 'white'},  borderRadius: 25 }}}>
+                <SkipPreviousIcon style={{fontSize:'20pt', color: 'blue'}} />
+                </IconButton>
+                <IconButton onClick={handleStop} aria-label='stop'
+                    sx = {{display: {  backgroundColor: '#12345',
+                    '&:hover': {
+                        backgroundColor: 'gray',
+                        color: 'white'},  borderRadius: 25 }}}>
+                <StopIcon style={{fontSize:'20pt', color: 'blue'}} />
+                </IconButton>
+                <IconButton onClick={handlePlay} aria-label='play'
+                    sx = {{display: {  backgroundColor: '#12345',
+                    '&:hover': {
+                        backgroundColor: 'gray',
+                        color: 'white'},  borderRadius: 25 }}}>
+                <PlayArrowIcon style={{fontSize:'20pt', color: 'blue'}} />
+                </IconButton>
+                <IconButton onClick={handleSkipForward} aria-label='forward'
+                    sx = {{display: {  backgroundColor: '#12345',
+                    '&:hover': {
+                        backgroundColor: 'gray',
+                        color: 'white'},  borderRadius: 25 }}}>
+                <SkipNextIcon style={{fontSize:'20pt', color: 'blue'}} />
+                </IconButton>
+                </Box>
+            
+            </div>
+            </Box>
     }
-
 
     return (
     <Box>
         
             {playerWindow}
-        <div id="player-controller">
-        <Box sx ={{borderColor: 'black', borderWidth: '2px', borderStyle: 'solid', borderRadius: 5}}>
-        <IconButton onClick={handleSkipBackward} aria-label='backward'
-            sx = {{display: { backgroundColor: '#12345',
-            '&:hover': {
-                backgroundColor: 'gray',
-                color: 'white'},  borderRadius: 25 }}}>
-        <SkipPreviousIcon style={{fontSize:'20pt', color: 'blue'}} />
-        </IconButton>
-        <IconButton onClick={handleStop} aria-label='stop'
-            sx = {{display: {  backgroundColor: '#12345',
-            '&:hover': {
-                backgroundColor: 'gray',
-                color: 'white'},  borderRadius: 25 }}}>
-        <StopIcon style={{fontSize:'20pt', color: 'blue'}} />
-        </IconButton>
-        <IconButton onClick={handlePlay} aria-label='play'
-            sx = {{display: {  backgroundColor: '#12345',
-            '&:hover': {
-                backgroundColor: 'gray',
-                color: 'white'},  borderRadius: 25 }}}>
-        <PlayArrowIcon style={{fontSize:'20pt', color: 'blue'}} />
-        </IconButton>
-        <IconButton onClick={handleSkipForward} aria-label='forward'
-            sx = {{display: {  backgroundColor: '#12345',
-            '&:hover': {
-                backgroundColor: 'gray',
-                color: 'white'},  borderRadius: 25 }}}>
-        <SkipNextIcon style={{fontSize:'20pt', color: 'blue'}} />
-        </IconButton>
-        </Box>
-        </div>
+            
     </Box>
     );
   }

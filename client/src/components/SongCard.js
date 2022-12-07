@@ -1,3 +1,4 @@
+import { Typography } from '@mui/material';
 import zIndex from '@mui/material/styles/zIndex';
 import React, { useContext, useState } from 'react'
 import { GlobalStoreContext } from '../store'
@@ -47,7 +48,10 @@ function SongCard(props) {
     }
 
     function handleEdit(event) {
-        store.showEditSongModal(index, song);
+        if(!store.currentList.published) {
+            console.log(store.currentList.name); 
+            store.showEditSongModal(index, song);
+        }
     }
 
     function selectSong() {
@@ -64,6 +68,17 @@ function SongCard(props) {
     else 
         selectClass = "unselected-song-card";
 
+    let discard = "";
+    if(!store.currentList.published){
+        discard = 
+        <input
+            type="button"
+            id={"remove-song-" + index}
+            className="list-card-button"
+            value={"🗑"}
+            onClick={handleRemoveSong}
+        />
+    }
 
     let cardClass = "list-card unselected-list-card";
     return (
@@ -81,20 +96,11 @@ function SongCard(props) {
             draggable="true"
             //onClick={handleClick}
         >
-            {index + 1}.
-            <a
-                id={'song-' + index + '-link'}
-                className="song-link"
-                href={"https://www.youtube.com/watch?v=" + song.youTubeId} target = "_blank" rel = "noopener noreferrer">
+            <Typography sx={{color:"black"}}> 
+                {index + 1}.
                 {song.title} by {song.artist}
-            </a>
-            <input
-                type="button"
-                id={"remove-song-" + index}
-                className="list-card-button"
-                value={"🗑"}
-                onClick={handleRemoveSong}
-            />
+            </Typography>
+            {discard}
         </div>
     );
 }

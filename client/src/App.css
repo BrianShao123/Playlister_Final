@@ -1,3 +1,4 @@
+
 :root {
   /* 
        
@@ -11,6 +12,7 @@
   --cool: linear-gradient(to bottom, #B8FFED, #9795FE);
   --my-font-family: "Robaaaoto";
   --bounceEasing: cubic-bezier(0.51, 0.92, 0.24, 1.15);
+
 }
 
 body {
@@ -53,7 +55,7 @@ body {
 #splash-toolbar {
 
   position: absolute;
-  right: 37.5%;
+  right: 42%;
   top: 60%;
   font-size: 2vw;
   height:5%;
@@ -73,7 +75,7 @@ body {
 
 #sign-up {
   position: absolute;
-  right: 80%;
+  right: 75%;
   top: 120%;
   height:5%;
   text-align: center;
@@ -123,7 +125,7 @@ body {
 
 #sort {
   position: relative;
-  left: 51%;
+  left: 50%;
   height: 5%;
   
 }

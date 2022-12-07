@@ -97,13 +97,9 @@ export default function AppBanner() {
                     <Typography                        
                         variant="h4"
                         noWrap
-                        component="div"
-                        sx={{ display: { xs: 'none', sm: 'block',  backgroundColor: '#12345',
-                        '&:hover': {
-                          backgroundColor: 'white',
-                          opacity: [0.9, 0.8, 0.7],  }, borderRadius: 100 } }}                        
+                        component="div"                      
                     >
-                        <Link style={{ textDecoration: 'none', color: 'Red' }} to='/'>Playlister</Link>
+                        <Link style={{ textDecoration: 'none', color: 'Red', fontFamily: 'Satisfy' }} to='/'>Playlister</Link>
                     </Typography>
                     <Box sx={{ display: { xs: 'none', md: 'flex' }, transform: 'translate(82vw ,0em) scale(1)'}}>
                         <IconButton

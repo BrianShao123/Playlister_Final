@@ -1,7 +1,6 @@
 import React, { createContext, useEffect, useState } from "react";
 import { useHistory } from 'react-router-dom'
 import api from './auth-request-api'
-
 const AuthContext = createContext();
 console.log("create AuthContext: " + AuthContext);
 
@@ -22,6 +21,7 @@ function AuthContextProvider(props) {
         error: false,
         errMessage: null
     });
+
     const history = useHistory();
 
     useEffect(() => {
@@ -148,12 +148,14 @@ function AuthContextProvider(props) {
         try {
         const response = await api.loginUser(email, password);
         if (response.status === 200) {
+            
             authReducer({
                 type: AuthActionType.LOGIN_USER,
                 payload: {
                     user: response.data.user
                 }
             })
+            
             console.log(response.data.user);
             history.push("/");
         }

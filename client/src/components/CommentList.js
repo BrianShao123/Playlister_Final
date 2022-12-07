@@ -12,7 +12,7 @@ function CommentList() {
     const [comment, setComment] = useState("");
 
     let commentCard = "";
-    let inputBar = "";
+    let inputBar =  "";
 
     function handleSendComment() {
         let send = comment;
@@ -37,7 +37,8 @@ function CommentList() {
     }
 
 
-    if(store.currentList){
+    //console.log(store.currentList);
+    if(store.currentList && store.currentList.published){
         commentCard = 
             <Box container style = {{
                 //width: '100%',
@@ -73,27 +74,53 @@ function CommentList() {
                     ))  
                 }
             </Box>;
-        inputBar = 
-            <div id="comment-bar"> 
-                <TextField 
-                    id="outlined-basic" 
-                    label="Post Comment" 
-                    variant="outlined" 
-                    //InputProps={{ startAdornment: <SearchIcon/> }}
-                    sx={{ backgroundColor: 'white', width: '35vw' }}
-                    onChange ={handleCommentUpdate}
-                    onKeyPress={handleKeyPress}
-                    value = {comment}
-                />
-                <Button 
-                    id = {"send-comment-" + 2}
-                    onClick={handleSendComment} 
-                    aria-label='send'
-                    variant="contained">
-                    
-                    <SendIcon sx={{ fontSize: 40 }}/>
-                </Button>
-            </div>
+        if(store.getUserName() != "GuestJoefpNhX925k4") {
+            inputBar = 
+                <div id="comment-bar"> 
+                    <TextField 
+                        id="outlined-basic" 
+                        label="Post Comment" 
+                        variant="outlined" 
+                        //InputProps={{ startAdornment: <SearchIcon/> }}
+                        sx={{ backgroundColor: 'white', width: '35vw' }}
+                        onChange ={handleCommentUpdate}
+                        onKeyPress={handleKeyPress}
+                        value = {comment}
+                    />
+                    <Button 
+                        id = {"send-comment-" + 2}
+                        onClick={handleSendComment} 
+                        aria-label='send'
+                        variant="contained">
+                        
+                        <SendIcon sx={{ fontSize: 40 }}/>
+                    </Button>
+                </div>
+            }
+            else
+            inputBar = <div id="comment-bar"> 
+            <TextField 
+                id="outlined-basic" 
+                label="Post Comment" 
+                variant="outlined" 
+                //InputProps={{ startAdornment: <SearchIcon/> }}
+                sx={{ backgroundColor: 'white', width: '35vw' }}
+                onChange ={handleCommentUpdate}
+                onKeyPress={handleKeyPress}
+                value = {"Disabled to Guests"}
+                disabled
+            />
+            <Button 
+                id = {"send-comment-" + 2}
+                onClick={handleSendComment} 
+                aria-label='send'
+                variant="contained"
+                disabled>
+                
+                <SendIcon sx={{ fontSize: 44 }}/>
+            </Button>
+        </div>
+
         }
 
     return (

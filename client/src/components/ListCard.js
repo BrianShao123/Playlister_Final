@@ -113,6 +113,7 @@ function ListCard(props) {
     if (event.code === "Enter" && text) {
       let id = event.target.id.substring("list-".length);
       store.changeListName(id, text);
+      //store.loadIdNamePairs();
       toggleEdit();
     }
     else if (event.code == 'Enter' && !text) {
@@ -132,11 +133,26 @@ function ListCard(props) {
     cardStatus = true;
   }
 
+
+  function handleLike(event) {
+    event.stopPropagation();
+    let id = event.target.id.substring("like-".length);
+    console.log(event.target.id);
+    store.setCurrentPlayingList(id);
+  }
+
+  function handleDislike(event) {
+    event.stopPropagation();
+    let id = event.target.id.substring("dislike-".length);
+    console.log(event.target.id);
+    store.setCurrentPlayingList(id);
+  }
+
   function handleSelectCard(event) {
     event.stopPropagation();
-    let id = event.target.id;
-    id = ("" + id).substring("list-card-".length);
-    store.setCurrentList(id);
+    let id = event.target.id.substring("list-card-".length);
+    console.log(event.target.id);
+    store.setCurrentPlayingList(id);
     selectClass = "selected-list-card";
   }
 
@@ -148,10 +164,11 @@ function ListCard(props) {
   let editToolbar = "";
   let buttonSet = "";
   let publishDate = "";
+  let listens = "";
   //console.log(idNamePair.published);
-  if (idNamePair.published) {
+  if (idNamePair.published && store.getUserName() != "GuestJoefpNhX925k4") {
     thumbsUp =
-      <IconButton onClick={openCurrentList} aria-label='edit'
+      <IconButton onClick={openCurrentList} aria-label='thumbsup'
         sx={{
           display: {
             xs: 'none', sm: 'block', backgroundColor: '#12345',
@@ -164,7 +181,7 @@ function ListCard(props) {
         <ThumbUpOffAltIcon style={{ fontSize: '20pt', color: 'blue' }} />
       </IconButton>
     thumbsDown =
-      <IconButton onClick={openCurrentList} aria-label='edit'
+      <IconButton onClick={openCurrentList} aria-label='thumbsdown'
         sx={{
           display: {
             xs: 'none', sm: 'block', backgroundColor: '#12345',
@@ -176,12 +193,49 @@ function ListCard(props) {
         }}>
         <ThumbDownOffAltIcon style={{ fontSize: '20pt', color: 'blue' }} />
       </IconButton>
+    console.log("LIST CARD LISTENS " + idNamePair.listens);
     numLikes = idNamePair.likes;
     numDislikes = idNamePair.dislikes;
     publishDate = "Published: " + idNamePair.publishDate;
+    listens = "Listens: " + idNamePair.listens;
   }
+  else if (idNamePair.published && store.getUserName() == "GuestJoefpNhX925k4") {
+      thumbsUp =
+      <IconButton id = {"like-"+idNamePair._id} onClick={handleLike} aria-label='thumbsup' disabled
+        sx={{
+          display: {
+            xs: 'none', sm: 'block', backgroundColor: '#12345',
+            '&:hover': {
+              backgroundColor: 'gray',
+              color: 'white'
+            }, borderRadius: 10
+          }
+        }}>
+        <ThumbUpOffAltIcon style={{ fontSize: '20pt', color: 'blue' }} />
+      </IconButton>
+    thumbsDown =
+      <IconButton id = {"dislike-"+idNamePair._id} onClick={handleDislike} aria-label='thumbsdown' disabled
+        sx={{
+          display: {
+            xs: 'none', sm: 'block', backgroundColor: '#12345',
+            '&:hover': {
+              backgroundColor: 'gray',
+              color: 'white'
+            }, borderRadius: 10
+          }
+        }}>
+        <ThumbDownOffAltIcon style={{ fontSize: '20pt', color: 'blue' }} />
+      </IconButton>
+    console.log("LIST CARD LISTENS " + idNamePair.listens);
+    numLikes = idNamePair.likes;
+    numDislikes = idNamePair.dislikes;
+    publishDate = "Published: " + idNamePair.publishDate;
+    listens = "Listens: " + idNamePair.listens;
+  }
+
+
   if (store.currentList) {
-    if (store.currentList._id === idNamePair._id && !idNamePair.published) {
+    if (store.currentList._id === idNamePair._id && !idNamePair.published ) {
       editToolbar =
         <EditToolbar />;
       buttonSet =
@@ -204,7 +258,7 @@ function ListCard(props) {
           </Button>
         </Box>;
     }
-    else if (store.currentList._id === idNamePair._id && idNamePair.published)
+    else if (store.currentList._id === idNamePair._id && idNamePair.published && store.getUserName() != "GuestJoefpNhX925k4")
     {buttonSet =
       <Button
             id={"clone-list-" + idNamePair._id}
@@ -292,7 +346,7 @@ function ListCard(props) {
 
       <Grid item xs={8} sx={{ transform: 'translate(1em ,0.5em) scale(1)' }}>By: {idNamePair.userName} </Grid>
       <Grid item xs={1} sx={{ transform: 'translate(1.5em ,-0.55em) scale(1)' }}>{numLikes} </Grid>
-      <Grid item xs={1} sx={{ transform: 'translate(3.8em ,-0.55em) scale(1)' }}>{numDislikes} </Grid>
+      <Grid item xs={1} sx={{ transform: 'translate(4.5em ,-0.55em) scale(1)' }}>{numDislikes} </Grid>
 
       <Grid item xs={12} >{songCard} </Grid>
 
@@ -300,7 +354,7 @@ function ListCard(props) {
       <Grid item xs={4} sx={{ transform: 'translate(9.4em ,0.8em) scale(1)' }}>{editToolbar} </Grid>
 
       <Grid item xs={8} sx={{ transform: 'translate(1em ,0.5em) scale(1)' }}>{publishDate}</Grid>
-      <Grid item xs={2} sx={{ transform: 'translate(-2em ,0.5em) scale(1)' }}>{'Listens:' + 10000} </Grid>
+      <Grid item xs={2} sx={{ transform: 'translate(-2em ,0.5em) scale(1)' }}>{listens} </Grid>
       <Grid item xs={1} sx={{ transform: 'translate(2em , 0.4em) scale(1)' }}>
         <IconButton id={"expand-" + idNamePair._id}
           onClick={toggleOpen}
