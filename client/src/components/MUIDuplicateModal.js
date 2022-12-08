@@ -54,7 +54,7 @@ export default function MUIDuplicateModal() {
 
                 <div className="modal-center">
                     <header className="dialog-header">
-                        Duplicate the {name} Playlist?
+                        Duplicate the "{name}" Playlist?
                     </header>
                 </div>
                 <div

@@ -394,7 +394,8 @@ function GlobalStoreContextProvider(props) {
                     listNameActive: false,
                     listIdMarkedForDeletion: null,
                     listMarkedForDeletion: null,
-                    songMarkedForDeletion:payload.currentSong
+                    songMarkedForDeletion:payload.currentSong,
+                    currentView: store.currentView,
                 });
             }
             case GlobalStoreActionType.HIDE_MODALS: {
@@ -478,7 +479,7 @@ function GlobalStoreContextProvider(props) {
     store.createNewList = async function () {
         let newListName = "Untitled";
         console.log(auth.user.userName);
-        const response = await api.createPlaylist(auth.user.userName, newListName, [], auth.user.email, false, 0, 0, " ", 0);
+        const response = await api.createPlaylist(auth.user.userName, newListName, [], auth.user.email, false, 0, 0, " ", 0, [], []);
         //console.log("createNewList response: " + response);
         if (response.status === 201) {
             //console.log("In conditional")
@@ -633,7 +634,7 @@ function GlobalStoreContextProvider(props) {
         let songs = store.listMarkedForDuplicate.songs;
         console.log(songs)
         //console.log("GOT HERE")
-        const response = await api.createPlaylist(auth.user.userName, newListName, songs, auth.user.email, false, 0, 0, " ", 0);
+        const response = await api.createPlaylist(auth.user.userName, newListName, songs, auth.user.email, false, 0, 0, " ", 0, [], []);
         //console.log("createNewList response: " + response);
         console.log(response.status);
         if (response.status === 201) {
@@ -921,12 +922,321 @@ function GlobalStoreContextProvider(props) {
 
     }
 
+    store.incrementLikesAndDecrementDislikes = function (id) {
+        let found = "";
+        let check = false;
+        let checkDislike = false;
+        //let foundDislike = "";
+        for(let i = 0; i < store.idNamePairs.length; i++) {
+            if(store.idNamePairs[i]._id == id) {
+                found = store.idNamePairs[i];
+            }
+        }
+        if(found != "") {
+            for(let i = 0; i < found.dislikedBy.length; i++)
+            {
+                if(found.dislikedBy[i].username == store.getUserName())
+                {
+                    check = true; 
+                    break; 
+                }
+            }
+        }
+        if (check){
+            found.dislikes += -1;
+            for(let i = 0; i < found.dislikedBy.length; i++) {
+                if(found.dislikedBy[i].username == store.getUserName())
+                {
+                    found.dislikedBy.splice(i, 1);
+                    break;
+                }
+            }
+            found.likes += 1;
+            found.likedBy.push({username: store.getUserName()});
+            async function asyncUpdateListLikes() {
+                const response = await api.updatePlaylist(found._id, found);
+                    if(response.data.success)
+                    {
+                        console.log("List liked updated");
+                        if(store.currentView == "HOME")
+                        {
+                            store.loadIdNamePairs();
+                        }
+                        else{ 
+                        const response = await api.getPlaylists();
+                            if (response.data.success) {
+                                let pairsArray = response.data.idNamePairs;
+                                storeReducer({
+                                    type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
+                                    payload: pairsArray
+                                });
+                        }
+                    }
+                
+                }
+            }
+                asyncUpdateListLikes();
+        }
+        else{
+            store.likePlaylist(id);
+        }
+    }
+
+
+    store.incrementDislikesAndDecrementLikes = function (id) {
+        let found = "";
+        let check = false;
+        for(let i = 0; i < store.idNamePairs.length; i++) {
+            if(store.idNamePairs[i]._id == id) {
+                found = store.idNamePairs[i];
+            }
+        }
+        if(found != "") {
+            for(let i = 0; i < found.likedBy.length; i++)
+            {
+                if(found.likedBy[i].username == store.getUserName())
+                {
+                    check = true; 
+                    break; 
+                }
+            }
+        }
+        if (check){
+            found.likes += -1;
+            for(let i = 0; i < found.likedBy.length; i++) {
+                if(found.likedBy[i].username == store.getUserName())
+                {
+                    found.likedBy.splice(i, 1);
+                    break;
+                }
+            }
+            found.dislikes += 1;
+            found.dislikedBy.push({username: store.getUserName()});
+            async function asyncUpdateListDislikes() {
+                const response = await api.updatePlaylist(found._id, found);
+                    if(response.data.success)
+                    {
+                        console.log("List liked updated");
+                        if(store.currentView == "HOME")
+                        {
+                            store.loadIdNamePairs();
+                        }
+                        else{ 
+                        const response = await api.getPlaylists();
+                            if (response.data.success) {
+                                let pairsArray = response.data.idNamePairs;
+                                storeReducer({
+                                    type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
+                                    payload: pairsArray
+                                });
+                        }
+                    }
+                
+                }
+            }
+                asyncUpdateListDislikes();
+        }
+        else {
+            store.dislikePlaylist(id);
+        }
+    }
+
+
+
+
+
+    store.decrementLikes = function (id) {
+        let found = "";
+        let check = false;
+        for(let i = 0; i < store.idNamePairs.length; i++) {
+            if(store.idNamePairs[i]._id == id) {
+                found = store.idNamePairs[i];
+            }
+        }
+        if(found != "") {
+            for(let i = 0; i < found.likedBy.length; i++)
+            {
+                if(found.likedBy[i].username == store.getUserName())
+                {
+                    check = true; 
+                    break; 
+                }
+            }
+        }
+        console.log("THIS IS " + found);
+        if (check){
+            found.likes += -1;
+            for(let i = 0; i < found.likedBy.length; i++) {
+                if(found.likedBy[i].username == store.getUserName())
+                {
+                    found.likedBy.splice(i, 1);
+                    break;
+                }
+            }
+            async function asyncUpdateDecrementLikes() {
+            const response = await api.updatePlaylist(found._id, found);
+                if(response.data.success)
+                {
+                    console.log("List liked updated");
+                    if(store.currentView == "HOME")
+                    {
+                        store.loadIdNamePairs();
+                    }
+                    else{ 
+                    const response = await api.getPlaylists();
+                        if (response.data.success) {
+                            let pairsArray = response.data.idNamePairs;
+                            storeReducer({
+                                type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
+                                payload: pairsArray
+                            });
+                    }
+                }
+            
+            }
+        }
+            asyncUpdateDecrementLikes();
+        }
+    }
+
+    store.decrementDislikes = function (id) {
+        let found = "";
+        let check = false;
+        for(let i = 0; i < store.idNamePairs.length; i++) {
+            if(store.idNamePairs[i]._id == id) {
+                found = store.idNamePairs[i];
+            }
+        }
+        if(found != "") {
+            for(let i = 0; i < found.dislikedBy.length; i++)
+            {
+                if(found.dislikedBy[i].username == store.getUserName())
+                {
+                    check = true; 
+                    break; 
+                }
+            }
+        }
+        console.log("THIS IS " + found);
+        if (check){
+            found.dislikes += -1;
+            for(let i = 0; i < found.dislikedBy.length; i++) {
+                if(found.dislikedBy[i].username == store.getUserName())
+                {
+                    found.dislikedBy.splice(i, 1);
+                    break;
+                }
+            }
+            async function asyncUpdateDecrementDislikes() {
+            const response = await api.updatePlaylist(found._id, found);
+                if(response.data.success)
+                {
+                    console.log("List disliked updated -1");
+                    if(store.currentView == "HOME")
+                    {
+                        store.loadIdNamePairs();
+                    }
+                    else{ 
+                    const response = await api.getPlaylists();
+                        if (response.data.success) {
+                            let pairsArray = response.data.idNamePairs;
+                            storeReducer({
+                                type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
+                                payload: pairsArray
+                            });
+                    }
+                }
+            
+            }
+        }
+            asyncUpdateDecrementDislikes();
+        }
+    }
+
+    store.likePlaylist = function (id) {
+        let found = "";
+        for(let i = 0; i < store.idNamePairs.length; i++) {
+            if(store.idNamePairs[i]._id == id) {
+                found = store.idNamePairs[i];
+            }
+        }
+        console.log("THIS IS " + found);
+        if (found != ""){
+            found.likes += 1;
+            found.likedBy.push({username: store.getUserName()});
+            async function asyncUpdateListLikes() {
+            const response = await api.updatePlaylist(found._id, found);
+                if(response.data.success)
+                {
+                    console.log("List liked updated");
+                    if(store.currentView == "HOME")
+                    {
+                        store.loadIdNamePairs();
+                    }
+                    else{ 
+                    const response = await api.getPlaylists();
+                        if (response.data.success) {
+                            let pairsArray = response.data.idNamePairs;
+                            storeReducer({
+                                type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
+                                payload: pairsArray
+                            });
+                    }
+                }
+            
+            }
+        }
+            asyncUpdateListLikes();
+        }
+    }   
+
+    store.dislikePlaylist = function (id) {
+        let found = "";
+        for(let i = 0; i < store.idNamePairs.length; i++) {
+            if(store.idNamePairs[i]._id == id) {
+                found = store.idNamePairs[i];
+                break;
+            }
+        }
+        console.log(found);
+        console.log("THIS IS " + found.dislikes);
+        if (found != ""){
+            found.dislikes += 1;
+            found.dislikedBy.push({username: store.getUserName()});
+            async function asyncUpdateListDislikes() {
+            const response = await api.updatePlaylist(found._id, found);
+                if(response.data.success)
+                {
+                    console.log("List disliked updated");
+                    if(store.currentView == "HOME")
+                    {
+                        store.loadIdNamePairs();
+                    }
+                    else{ 
+                    const response = await api.getPlaylists();
+                        if (response.data.success) {
+                            let pairsArray = response.data.idNamePairs;
+                            storeReducer({
+                                type: GlobalStoreActionType.LOAD_ID_NAME_PAIRS,
+                                payload: pairsArray
+                            });
+                    }
+                }
+            
+            }
+        }
+            asyncUpdateListDislikes();
+        }
+    }
+
+
+
     store.searchQuery = function (criteria) {
         //store.closeCurrentList();
         console.log("GOT HERE")
-        console.log(store.currentView);
-        console.log(store.idNamePairs);
-        console.log(store.idNamesView)
+        //console.log(store.currentView);
+        //console.log(store.idNamePairs);
+        //console.log(store.idNamesView)
         if(store.currentView === CurrentView.HOME) {
             let temp = store.idNamesView
             if(temp)
@@ -969,9 +1279,11 @@ function GlobalStoreContextProvider(props) {
                 store.idNamePairs = copy.filter((playlist) => {
                     return playlist.userName.toLowerCase().includes(criteria)  + playlist.userName.includes(criteria)  + playlist.userName.toUpperCase().includes(criteria);
             })
-            }
+        }
         }
     }
+    
+
 
 
     // THIS FUNCTION MOVES A SONG IN THE CURRENT LIST FROM

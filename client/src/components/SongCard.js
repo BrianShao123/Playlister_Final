@@ -2,6 +2,11 @@ import { Typography } from '@mui/material';
 import zIndex from '@mui/material/styles/zIndex';
 import React, { useContext, useState } from 'react'
 import { GlobalStoreContext } from '../store'
+import Box from '@mui/material/Box';
+import DeleteIcon from '@mui/icons-material/Delete';
+import IconButton from '@mui/material/IconButton';
+
+
 
 function SongCard(props) {
     const { store } = useContext(GlobalStoreContext);
@@ -61,6 +66,7 @@ function SongCard(props) {
     }
 
 
+
     let selectClass = "unselected-song-card";
     if (selected) {
         selectClass = "selected-song-card";
@@ -71,13 +77,10 @@ function SongCard(props) {
     let discard = "";
     if(!store.currentList.published){
         discard = 
-        <input
-            type="button"
-            id={"remove-song-" + index}
-            className="list-card-button"
-            value={"🗑"}
-            onClick={handleRemoveSong}
-        />
+        <IconButton id = {"remove-song-" + index} onClick={handleRemoveSong} aria-label='remove-song' 
+        sx={{float: 'right', transform: 'translate(0em ,-0.5em) scale(1)'}}>
+        <DeleteIcon style={{ fontSize: '20pt', color: 'Blue' }} />
+        </IconButton>
     }
 
     let cardClass = "list-card unselected-list-card";
@@ -90,17 +93,19 @@ function SongCard(props) {
             onDragOver={handleDragOver}
             onDragEnter={handleDragEnter}
             onDragLeave={handleDragLeave}
-            onClick={selectSong}
+            //onClick={selectSong}
             onDoubleClick = {handleEdit}
             onDrop={handleDrop}
             draggable="true"
             //onClick={handleClick}
         >
-            <Typography sx={{color:"black"}}> 
+            <Box> 
+            <Typography sx={{color:"Blue"}}> 
                 {index + 1}.
                 {song.title} by {song.artist}
+                {discard}
             </Typography>
-            {discard}
+            </Box>
         </div>
     );
 }

@@ -189,7 +189,11 @@ getPlaylistPairs = async (req, res) => {
                             likes: list.likes,
                             dislikes: list.dislikes,
                             publishDate: list.publishDate,
-                            listens: list.listens
+                            listens: list.listens,
+                            likedBy: list.likedBy,
+                            dislikedBy: list.dislikedBy,
+                            comments: list.comments,
+                            songs: list.songs
                         };
                         pairs.push(pair);
                     }
@@ -221,13 +225,44 @@ getPlaylists = async (req, res) => {
                             likes: list.likes,
                             dislikes: list.dislikes,
                             publishDate: list.publishDate,
-                            listens: list.listens
+                            listens: list.listens,
+                            likedBy: list.likedBy,
+                            dislikedBy: list.dislikedBy,
+                            comments: list.comments,
+                            songs: list.songs
                         };
                         pairs.push(pair);
                     }
         return res.status(200).json({ success: true, idNamePairs: pairs })
     }).catch(err => console.log(err))
 }
+
+likePlaylist = async (req, res) => {
+    const body = req.body
+
+    if (!body) {
+        return res.status(400).json({
+            success: false,
+            error: 'You must provide a body to update',
+        })
+    }
+
+    Playlist.findOne({ _id: req.params.id }, (err, playlist) => {
+        console.log("playlist found: " + JSON.stringify(playlist));
+        if (err) {
+            return res.status(404).json({
+                err,
+                message: 'Playlist not found!',
+            })
+        }
+
+        
+    })
+
+
+
+}
+
 updatePlaylist = async (req, res) => {
     const body = req.body
     console.log("updatePlaylist: " + JSON.stringify(body));
@@ -248,7 +283,7 @@ updatePlaylist = async (req, res) => {
                 message: 'Playlist not found!',
             })
         }
-
+        console.log("GOT hERE");
         // DOES THIS LIST BELONG TO THIS USER?
         async function asyncFindUser(list) {
             await User.findOne({ email: list.ownerEmail }, (err, user) => {
@@ -263,8 +298,10 @@ updatePlaylist = async (req, res) => {
                     list.songs = body.playlist.songs;
                     list.comments = body.playlist.comments;
                     list.likes = body.playlist.likes;
-                    list.dislike = body.playlist.dislikes
+                    list.dislikes = body.playlist.dislikes
                     list.listens = body.playlist.listens;
+                    list.likedBy = body.playlist.likedBy;
+                    list.dislikedBy = body.playlist.dislikedBy;
                     list
                         .save()
                         .then(() => {
@@ -299,5 +336,6 @@ module.exports = {
     getPlaylistPairs,
     getPlaylists,
     updatePlaylist,
+    likePlaylist,
     
 }

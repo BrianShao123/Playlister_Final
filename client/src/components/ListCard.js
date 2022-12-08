@@ -16,6 +16,8 @@ import Button from '@mui/material/Button';
 import PublishIcon from '@mui/icons-material/Publish';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
+import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
+import ThumbDownAltIcon from '@mui/icons-material/ThumbDownAlt';
 
 /*
     This is a card in our list of top 5 lists. It lets select
@@ -137,15 +139,41 @@ function ListCard(props) {
   function handleLike(event) {
     event.stopPropagation();
     let id = event.target.id.substring("like-".length);
-    console.log(event.target.id);
-    store.setCurrentPlayingList(id);
+    console.log("ID SENT I S " + event.target.id);
+    let found = false;
+    for(let i = 0; i < idNamePair.likedBy.length; i++) {
+      console.log(idNamePair.likedBy);
+      console.log(idNamePair.likedBy[i].userName)
+      if(idNamePair.likedBy[i].username == store.getUserName())
+      {
+        found = true;
+        store.decrementLikes(id);
+        break;
+      }
+    }
+
+    if(!found) 
+      store.incrementLikesAndDecrementDislikes(id);
   }
 
   function handleDislike(event) {
     event.stopPropagation();
     let id = event.target.id.substring("dislike-".length);
     console.log(event.target.id);
-    store.setCurrentPlayingList(id);
+    let found = false;
+    for(let i = 0; i < idNamePair.dislikedBy.length; i++) {
+      console.log(idNamePair.dislikedBy);
+      console.log(idNamePair.dislikedBy[i].userName)
+      if(idNamePair.dislikedBy[i].username == store.getUserName())
+      {
+        found = true;
+        store.decrementDislikes(id);
+        break;
+      }
+    }
+
+    if(!found) 
+      store.incrementDislikesAndDecrementLikes(id);
   }
 
   function handleSelectCard(event) {
@@ -156,7 +184,91 @@ function ListCard(props) {
     selectClass = "selected-list-card";
   }
 
+  
+  let isLiked = "";
+  let isDisliked = ""; 
+  let likedOn = "";
+  let likedOff = "";
+  let dislikedOn = "";
+  let dislikedOff = ""; 
 
+  if(idNamePair.published) {
+  for(let i = 0; i < idNamePair.likedBy.length; i++) {
+    console.log(idNamePair.likedBy);
+    console.log(idNamePair.likedBy[i].userName)
+    if(idNamePair.likedBy[i].username == store.getUserName())
+    {
+        isLiked = true;
+        isDisliked = false; 
+    }
+  }
+
+  for(let i = 0; i < idNamePair.dislikedBy.length; i++) {
+    if(idNamePair.dislikedBy[i].username == store.getUserName())
+    {
+        isDisliked = true;
+        isLiked = false; 
+    }
+  }
+
+  likedOn = 
+  <IconButton id = {"like-"+idNamePair._id} onClick={handleLike} aria-label='thumbsup'
+      sx={{
+        display: {
+          xs: 'none', sm: 'block', backgroundColor: '#12345',
+          '&:hover': {
+            backgroundColor: 'gray',
+            color: 'white'
+          }, borderRadius: 10
+        }
+      }}>
+      <ThumbUpAltIcon style={{ fontSize: '20pt', color: 'blue' }} />
+    </IconButton>;
+
+
+  likedOff = 
+  <IconButton id = {"like-"+idNamePair._id} onClick={handleLike} aria-label='thumbsup'
+  sx={{
+    display: {
+      xs: 'none', sm: 'block', backgroundColor: '#12345',
+      '&:hover': {
+        backgroundColor: 'gray',
+        color: 'white'
+      }, borderRadius: 10
+    }
+  }}>
+  <ThumbUpOffAltIcon style={{ fontSize: '20pt', color: 'blue' }} />
+  </IconButton>;
+
+  dislikedOn = 
+  <IconButton id = {"dislike-"+idNamePair._id} onClick={handleDislike} aria-label='thumbsdown'
+      sx={{
+        display: {
+          xs: 'none', sm: 'block', backgroundColor: '#12345',
+          '&:hover': {
+            backgroundColor: 'gray',
+            color: 'white'
+          }, borderRadius: 10
+        }
+      }}>
+      <ThumbDownAltIcon style={{ fontSize: '20pt', color: 'blue' }} />
+    </IconButton>;
+
+  dislikedOff = 
+  <IconButton id = {"dislike-"+idNamePair._id} onClick={handleDislike} aria-label='thumbsdown'
+    sx={{
+      display: {
+        xs: 'none', sm: 'block', backgroundColor: '#12345',
+        '&:hover': {
+          backgroundColor: 'gray',
+          color: 'white'
+        }, borderRadius: 10
+      }
+    }}>
+    <ThumbDownOffAltIcon style={{ fontSize: '20pt', color: 'blue' }} />
+  </IconButton>;
+
+  }
   let thumbsUp = "";
   let thumbsDown = "";
   let numLikes = "";
@@ -168,7 +280,7 @@ function ListCard(props) {
   //console.log(idNamePair.published);
   if (idNamePair.published && store.getUserName() != "GuestJoefpNhX925k4") {
     thumbsUp =
-      <IconButton onClick={openCurrentList} aria-label='thumbsup'
+      <IconButton id = {"like-"+idNamePair._id} onClick={handleLike} aria-label='thumbsup'
         sx={{
           display: {
             xs: 'none', sm: 'block', backgroundColor: '#12345',
@@ -179,9 +291,9 @@ function ListCard(props) {
           }
         }}>
         <ThumbUpOffAltIcon style={{ fontSize: '20pt', color: 'blue' }} />
-      </IconButton>
+      </IconButton>;
     thumbsDown =
-      <IconButton onClick={openCurrentList} aria-label='thumbsdown'
+      <IconButton id = {"dislike-"+idNamePair._id} onClick={handleDislike} aria-label='thumbsdown'
         sx={{
           display: {
             xs: 'none', sm: 'block', backgroundColor: '#12345',
@@ -192,7 +304,7 @@ function ListCard(props) {
           }
         }}>
         <ThumbDownOffAltIcon style={{ fontSize: '20pt', color: 'blue' }} />
-      </IconButton>
+      </IconButton>;
     console.log("LIST CARD LISTENS " + idNamePair.listens);
     numLikes = idNamePair.likes;
     numDislikes = idNamePair.dislikes;
@@ -201,7 +313,7 @@ function ListCard(props) {
   }
   else if (idNamePair.published && store.getUserName() == "GuestJoefpNhX925k4") {
       thumbsUp =
-      <IconButton id = {"like-"+idNamePair._id} onClick={handleLike} aria-label='thumbsup' disabled
+      <IconButton aria-label='thumbsup' disabled
         sx={{
           display: {
             xs: 'none', sm: 'block', backgroundColor: '#12345',
@@ -214,7 +326,7 @@ function ListCard(props) {
         <ThumbUpOffAltIcon style={{ fontSize: '20pt', color: 'blue' }} />
       </IconButton>
     thumbsDown =
-      <IconButton id = {"dislike-"+idNamePair._id} onClick={handleDislike} aria-label='thumbsdown' disabled
+      <IconButton aria-label='thumbsdown' disabled
         sx={{
           display: {
             xs: 'none', sm: 'block', backgroundColor: '#12345',
@@ -226,7 +338,7 @@ function ListCard(props) {
         }}>
         <ThumbDownOffAltIcon style={{ fontSize: '20pt', color: 'blue' }} />
       </IconButton>
-    console.log("LIST CARD LISTENS " + idNamePair.listens);
+    //console.log("LIST CARD LISTENS " + idNamePair.listens);
     numLikes = idNamePair.likes;
     numDislikes = idNamePair.dislikes;
     publishDate = "Published: " + idNamePair.publishDate;
@@ -235,6 +347,7 @@ function ListCard(props) {
 
 
   if (store.currentList) {
+    //console.log(idNamePair.userName + " " + store.getUserName())
     if (store.currentList._id === idNamePair._id && !idNamePair.published ) {
       editToolbar =
         <EditToolbar />;
@@ -257,6 +370,24 @@ function ListCard(props) {
             <ContentCopyIcon />
           </Button>
         </Box>;
+    }
+    else if(store.currentList._id === idNamePair._id && idNamePair.published && (store.getUserName() == idNamePair.userName))
+    {
+      {buttonSet =
+        <Box> 
+        <Button id={"delete-list-" + idNamePair._id}
+            onClick={handleDeleteList} aria-label='delete'
+            variant="contained">
+            <DeleteIcon />
+          </Button>
+        <Button
+              id={"clone-list-" + idNamePair._id}
+              onClick={handleCloneList}
+              variant="contained">
+              <ContentCopyIcon />
+            </Button>
+        </Box>
+      }
     }
     else if (store.currentList._id === idNamePair._id && idNamePair.published && store.getUserName() != "GuestJoefpNhX925k4")
     {buttonSet =
@@ -338,10 +469,10 @@ function ListCard(props) {
         onDoubleClick={toggleEdit}>{cardName} </Grid>
 
       <Grid item xs={2} sx={{ transform: 'translate(1em ,0em) scale(1)' }}>
-        {thumbsUp}
+        {isLiked ? likedOn: likedOff}
       </Grid>
       <Grid item xs={2} sx={{ transform: 'translate(1em ,0em) scale(1)' }}>
-        {thumbsDown}
+        {isDisliked ? dislikedOn: dislikedOff}
       </Grid>
 
       <Grid item xs={8} sx={{ transform: 'translate(1em ,0.5em) scale(1)' }}>By: {idNamePair.userName} </Grid>
