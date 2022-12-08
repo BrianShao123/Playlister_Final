@@ -582,9 +582,12 @@ function GlobalStoreContextProvider(props) {
         temp.listens++;
         console.log("# of listens is " + temp.listens);
         //store.updateList();
-        store.getPublishedPlaylistPairs();
-        console.log("RUNN BITCH")
-        
+        if(store.currentView == "HOME")
+        {
+            store.updateCurrentList();
+        }
+        else
+            store.getPublishedPlaylistPairs();
     
     }
 
@@ -831,7 +834,7 @@ function GlobalStoreContextProvider(props) {
     
     store.sortByDislikes = function () {
         let temp = store.idNamePairs;
-        console.log(temp.sort(sort_by('disLikes', true)));
+        console.log(temp.sort(sort_by('dislikes', true)));
         console.log(temp);
         storeReducer({
             type: GlobalStoreActionType.SET_ID_NAME_PAIRS,
