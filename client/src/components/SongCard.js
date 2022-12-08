@@ -1,5 +1,4 @@
 import { Typography } from '@mui/material';
-import zIndex from '@mui/material/styles/zIndex';
 import React, { useContext, useState } from 'react'
 import { GlobalStoreContext } from '../store'
 import Box from '@mui/material/Box';

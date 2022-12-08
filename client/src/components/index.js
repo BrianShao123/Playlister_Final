@@ -14,7 +14,7 @@ import Statusbar from './Statusbar'
 import WorkspaceScreen from './WorkspaceScreen'
 import MUIPublishModal from './MUIPublishModal'
 import MUIDuplicateModal from './MUIDuplicateModal'
-
+import MUIChangeListNameErrorModal from './MUIChangeListNameErrorModal'
 /*
     This serves as a module so that we can import
     all the other components as we wish.
@@ -37,5 +37,6 @@ export {
     Statusbar, 
     WorkspaceScreen,
     MUIPublishModal,
-    MUIDuplicateModal
+    MUIDuplicateModal,
+    MUIChangeListNameErrorModal
 }

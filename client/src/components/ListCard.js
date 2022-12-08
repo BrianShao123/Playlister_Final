@@ -115,8 +115,11 @@ function ListCard(props) {
     if (event.code === "Enter" && text) {
       let id = event.target.id.substring("list-".length);
       store.changeListName(id, text);
+      let temp = store.checkForError();
       //store.loadIdNamePairs();
-      toggleEdit();
+      if(!store.isListNameErrorModalOpen())
+        toggleEdit();
+      //store.loadIdNamePairs(); 
     }
     else if (event.code == 'Enter' && !text) {
       toggleEdit();
@@ -460,7 +463,7 @@ function ListCard(props) {
       className={selectClass}
       //onClick = {handleSelectCard}
       sx={{
-        backgroundColor: 'red', borderRadius: 5, width: '95%',
+        backgroundColor: 'lightblue', borderRadius: 5, width: '95%',
         transform: 'translate(0em ,-1em) scale(1)', display: 'flex', border: 1, marginTop: 2
       }}
     >

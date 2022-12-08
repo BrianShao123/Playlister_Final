@@ -40,7 +40,8 @@ export const GlobalStoreActionType = {
     SET_ALL: "SET_ALL",
     SET_USERS: "SET_USERS",
     SET_ID_NAME_PAIRS: "SET_ID_NAME_PAIRS",
-    MARK_LIST_FOR_DUPLICATE: "MARK_LIST_FOR_DUPLICATE"
+    MARK_LIST_FOR_DUPLICATE: "MARK_LIST_FOR_DUPLICATE",
+    UNIQUE_LIST_NAME_ERROR: "UNIQUE_LIST_NAME_ERROR"
     
 }
 const CurrentView = {
@@ -58,7 +59,8 @@ const CurrentModal = {
     REMOVE_SONG : "REMOVE_SONG",
     ACCOUNT_ERROR_MODAL: "ACCOUNT_ERROR_MODAL",
     PUBLISH_LIST: "PUBLISH_LIST",
-    DUPLICATE_LIST: "DUPLICATE_LIST"
+    DUPLICATE_LIST: "DUPLICATE_LIST",
+    CHANGE_LIST_NAME_ERROR: "CHANGE_LIST_NAME_ERROR"
 }
 
 const sort_by = (field, reverse, primer) => {
@@ -100,7 +102,9 @@ function GlobalStoreContextProvider(props) {
         currentSongPlayed: 0,
         listIdMarkedForDuplicate: null,
         listMarkedForDuplicate: null,
-        idNamesView : null
+        idNamesView : null,
+        listMarkedForChangeName: null,
+        changeNameSuccess: false,
 
     });
     const history = useHistory();
@@ -132,7 +136,9 @@ function GlobalStoreContextProvider(props) {
                     listIdMarkedForPublication: null,
                     listMarkedForPublication: null,
                     idNamesView: store.idNamePairs,
-                    currentView: store.currentView
+                    currentView: store.currentView,
+                    listMarkedForChangeName: null,
+                    changeListNameSuccess: true
                 });
             }
             // STOP EDITING THE CURRENT LIST
@@ -169,7 +175,27 @@ function GlobalStoreContextProvider(props) {
                     editSong: false,
                     listIdMarkedForPublication: null,
                     listMarkedForPublication: null,
-                    currentView: CurrentView.HOME
+                    currentView: store.currentView
+                })
+            }
+            case GlobalStoreActionType.UNIQUE_LIST_NAME_ERROR: {                
+                return setStore({
+                    currentModal : CurrentModal.CHANGE_LIST_NAME_ERROR,
+                    idNamePairs: store.idNamePairs,
+                    currentList: payload,
+                    currentSongIndex: -1,
+                    currentSong: null,
+                    newListCounter: store.newListCounter,
+                    listNameActive: false,
+                    listIdMarkedForDeletion: null,
+                    listMarkedForDeletion: null,
+                    editSong: false,
+                    listIdMarkedForPublication: null,
+                    listMarkedForPublication: null,
+                    currentView: CurrentView.HOME,
+                    listMarkedForChangeName: payload,
+                    changeListNameSuccess: false
+                    
                 })
             }
             // GET ALL THE LISTS SO WE CAN PRESENT THEM
@@ -427,6 +453,14 @@ function GlobalStoreContextProvider(props) {
     // THIS FUNCTION PROCESSES CHANGING A LIST NAME
     store.changeListName = function (id, newName) {
         // GET THE LIST
+        let count = 1;
+        let found = false;
+        for(let i = 0; i < store.idNamePairs.length; i++) {
+            if(store.idNamePairs[i].name == newName){
+                count++;
+            }
+        }
+        if(count < 2) {
         async function asyncChangeListName(id) {
             store.currentList.name = newName; 
             let response = await api.getPlaylistById(id);
@@ -457,6 +491,17 @@ function GlobalStoreContextProvider(props) {
             }
         }
         asyncChangeListName(id);
+    }
+    else {
+        console.log("Not Unique Name detected")
+        storeReducer({
+            type: GlobalStoreActionType.UNIQUE_LIST_NAME_ERROR,
+            payload: store.currentList
+        });
+        console.log(store.listMarkedForChangeName);
+        console.log(store.currentModal);
+        console.log(store.isListNameErrorModalOpen());
+    }
         //console.log("STORE NAME PAIRS IS " + store.idNamePairs[0].name);
     }
 
@@ -464,6 +509,10 @@ function GlobalStoreContextProvider(props) {
         tps.clearAllTransactions();
     }
     
+    store.checkForError = function() {
+        return store.isListNameErrorModalOpen();
+    }
+
     // THIS FUNCTION PROCESSES CLOSING THE CURRENTLY LOADED LIST
     store.closeCurrentList = function () {
         storeReducer({
@@ -831,6 +880,9 @@ function GlobalStoreContextProvider(props) {
         return store.currentModal === CurrentModal.DUPLICATE_LIST;
     }
 
+    store.isListNameErrorModalOpen = () => {
+        return store.currentModal === CurrentModal.CHANGE_LIST_NAME_ERROR;
+    }
 
     // THE FOLLOWING 8 FUNCTIONS ARE FOR COORDINATING THE UPDATING
     // OF A LIST, WHICH INCLUDES DEALING WITH THE TRANSACTION STACK. THE

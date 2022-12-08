@@ -33,6 +33,7 @@ import CommentList from './CommentList';
 import YouTubePlayer from './YouTubePlayer';
 import MUIPublishModal from './MUIPublishModal';
 import MUIDuplicateModal from './MUIDuplicateModal';
+import MUIChangeListNameErrorModal from './MUIChangeListNameErrorModal';
 
 /*
     This React component lists all the top5 lists in the UI.
@@ -300,6 +301,10 @@ import MUIDuplicateModal from './MUIDuplicateModal';
     }
     else if(store.currentModal == "DUPLICATE_LIST") {
       modalJSX = <MUIDuplicateModal/>
+    }
+    else if(store.currentModal == "CHANGE_LIST_NAME_ERROR")
+    {
+      modalJSX = <MUIChangeListNameErrorModal/>
     }
     return (
       <Box> 
